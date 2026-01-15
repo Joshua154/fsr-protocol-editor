@@ -172,6 +172,9 @@ const TagInput = ({
             onBlur={() => {
               setTimeout(() => setIsOpen(false), 50);
             }}
+            disabled={
+              maxSelections !== -1 && selected.length >= maxSelections
+            }
             onKeyDown={handleKeyDown}
             className="w-full bg-transparent outline-none text-sm h-full py-1 text-slate-700"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
