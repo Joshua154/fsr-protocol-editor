@@ -29,7 +29,7 @@ A web-based editor for managing and generating protocols for Student Council (FS
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![People Select Light](./preview/light_peopleSelect.png) | ![People Select Dark](./preview/dark_peopleSelect.png) |
+| ![People Select Light](./preview/light_memberSelect.png) | ![People Select Dark](./preview/dark_memberSelect.png) |
 
 ### Session Management
 
