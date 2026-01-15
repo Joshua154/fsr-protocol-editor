@@ -12,17 +12,28 @@ import {
   Save,
   X,
   Clipboard,
+  GripVertical,
 } from "lucide-react";
 
-const ENV_FSR_MEMBERS = (process.env.NEXT_PUBLIC_FSR_MEMBERS || "")
-  .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
 
-const ENV_ASSOC_MEMBERS = (process.env.NEXT_PUBLIC_ASSOCIATED_MEMBERS || "")
-  .split(",")
-  .map((s) => s.trim())
-  .filter(Boolean);
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 
 type SessionItem = {
   id: string;
@@ -40,6 +51,18 @@ type ProtocolData = {
   Sitzung: Record<string, string[]>;
   [key: string]: unknown;
 };
+
+
+const ENV_FSR_MEMBERS = (process.env.NEXT_PUBLIC_FSR_MEMBERS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const ENV_ASSOC_MEMBERS = (process.env.NEXT_PUBLIC_ASSOCIATED_MEMBERS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 
 const sessionObjectToArray = (
   sitzung: Record<string, unknown>
@@ -62,6 +85,8 @@ const sessionArrayToObject = (items: SessionItem[]) => {
   return obj;
 };
 
+
+
 const TagInput = ({
   label,
   selected,
@@ -79,7 +104,6 @@ const TagInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter suggestions based on input and exclude already selected
   const availableOptions = suggestions.filter(
     (s) =>
       !selected.includes(s) && s.toLowerCase().includes(input.toLowerCase())
@@ -87,13 +111,10 @@ const TagInput = ({
 
   const addTag = (tag: string) => {
     if (maxSelections !== -1 && selected.length >= maxSelections) return;
-
     if (tag.trim() && !selected.includes(tag.trim())) {
       setSelected([...selected, tag.trim()]);
     }
     setInput("");
-    // setIsOpen(false); // Close dropdown after selection
-
     inputRef.current?.focus();
   };
 
@@ -108,7 +129,7 @@ const TagInput = ({
     } else if (e.key === "Backspace" && !input && selected.length > 0) {
       removeTag(selected[selected.length - 1]);
     } else if (e.key === "Escape") {
-      setIsOpen(false); // closing with Escape key
+      setIsOpen(false);
     }
   };
 
@@ -118,7 +139,7 @@ const TagInput = ({
         {label}
       </label>
       <div
-        className="flex flex-wrap gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-11.5"
+        className="flex flex-wrap gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-11.5 cursor-text"
         onClick={() => inputRef.current?.focus()}
       >
         {selected.map((tag) => (
@@ -138,8 +159,6 @@ const TagInput = ({
             </button>
           </span>
         ))}
-
-        {/* Dropdown Menu */}
         {isOpen &&
           availableOptions.length > 0 &&
           (maxSelections === -1 || selected.length < maxSelections) && (
@@ -169,12 +188,8 @@ const TagInput = ({
               setIsOpen(true);
             }}
             onFocus={() => setIsOpen(true)}
-            onBlur={() => {
-              setTimeout(() => setIsOpen(false), 50);
-            }}
-            disabled={
-              maxSelections !== -1 && selected.length >= maxSelections
-            }
+            onBlur={() => setTimeout(() => setIsOpen(false), 50)}
+            disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
             className="w-full bg-transparent outline-none text-sm h-full py-1 text-slate-700"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
@@ -184,6 +199,115 @@ const TagInput = ({
     </div>
   );
 };
+
+
+interface SortableSessionItemProps {
+  item: SessionItem;
+  updateTopicTitle: (id: string, val: string) => void;
+  removeTopic: (id: string) => void;
+  addPoint: (id: string) => void;
+  updatePoint: (id: string, idx: number, val: string) => void;
+  removePoint: (id: string, idx: number) => void;
+}
+
+const SortableSessionItem = ({
+  item,
+  updateTopicTitle,
+  removeTopic,
+  addPoint,
+  updatePoint,
+  removePoint,
+}: SortableSessionItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : "auto", // Bring dragged item to front
+    opacity: isDragging ? 0.9 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-xl shadow-sm border overflow-hidden group transition-shadow ${
+        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200"
+      }`}
+    >
+      {/* Topic Header */}
+      <div className="bg-slate-50 p-4 border-b border-slate-100 flex gap-4 items-center">
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-indigo-600 p-1"
+          title="Ziehen zum Sortieren"
+        >
+          <GripVertical size={20} />
+        </div>
+        
+        <input
+          type="text"
+          value={item.topic}
+          onChange={(e) => updateTopicTitle(item.id, e.target.value)}
+          className="flex-1 bg-transparent text-lg font-semibold text-slate-800 placeholder-slate-400 outline-none focus:underline decoration-indigo-300 underline-offset-4"
+          placeholder="Thema Titel..."
+          onKeyDown={(e) => e.stopPropagation()} // Stop DND from interfering with typing
+        />
+        <button
+          onClick={() => removeTopic(item.id)}
+          className="text-slate-400 hover:text-red-500 transition-colors p-2"
+          title="Thema löschen"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
+
+      {/* Bullet Points */}
+      <div className="p-4 space-y-3">
+        {item.points.map((point, idx) => (
+          <div key={idx} className="flex gap-3 items-start group/point">
+            <div className="mt-3.5 w-1.5 h-1.5 bg-indigo-500 rounded-full shrink-0"></div>
+            <textarea
+              value={point}
+              onChange={(e) => updatePoint(item.id, idx, e.target.value)}
+              className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 outline-none py-1 text-slate-600 leading-relaxed"
+              rows={
+                point == null || point === ""
+                  ? 1
+                  : Math.max(1, Math.ceil(point.length / 80))
+              }
+              placeholder="Inhalt des Tagesordnungspunkts..."
+              onKeyDown={(e) => e.stopPropagation()} 
+            />
+            <button
+              onClick={() => removePoint(item.id, idx)}
+              className="opacity-0 group-hover/point:opacity-100 text-slate-300 hover:text-red-400 transition-all p-1"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => addPoint(item.id)}
+          className="ml-5 text-sm text-slate-400 hover:text-indigo-600 flex items-center gap-1 mt-2"
+        >
+          <Plus size={14} /> Punkt hinzufügen
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 
 export default function ProtocolEditor() {
   const [fsrMembers, setFsrMembers] = useState<string[]>([]);
@@ -198,6 +322,18 @@ export default function ProtocolEditor() {
   const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Prevents accidental drags when clicking
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const processYamlContent = (content: string) => {
     try {
       const parsed = yaml.load(content) as ProtocolData;
@@ -205,15 +341,9 @@ export default function ProtocolEditor() {
 
       const parseList = (input: unknown): string[] => {
         if (Array.isArray(input))
-          return input
-            .map(String)
-            .map((s) => s.trim())
-            .filter(Boolean);
+          return input.map(String).map((s) => s.trim()).filter(Boolean);
         if (typeof input === "string")
-          return input
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
+          return input.split(",").map((s) => s.trim()).filter(Boolean);
         return [];
       };
 
@@ -240,38 +370,28 @@ export default function ProtocolEditor() {
     }
   };
 
-  // File Upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
-      const content = event.target?.result as string;
-      processYamlContent(content);
+      processYamlContent(event.target?.result as string);
     };
     reader.readAsText(file);
     e.target.value = "";
   };
 
-  // Clipboard Paste
   const handlePasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      if (!text) {
-        alert("Zwischenablage ist leer!");
-        return;
-      }
+      if (!text) return alert("Zwischenablage ist leer!");
       processYamlContent(text);
     } catch (err) {
-      console.error("Clipboard Access Failed", err);
-      alert(
-        "Es konnte nicht auf die Zwischenablage zugegriffen werden. Bitte Berechtigung prüfen."
-      );
+      console.error(err);
+      alert("Clipboard Zugriff verweigert.");
     }
   };
 
-  // Export YAML
   const handleExport = () => {
     const dataToExport = {
       FSR: fsrMembers,
@@ -299,7 +419,7 @@ export default function ProtocolEditor() {
     document.body.removeChild(a);
   };
 
-  // Session Editing Handlers
+  
   const addTopic = () => {
     setSessionItems([
       ...sessionItems,
@@ -309,9 +429,7 @@ export default function ProtocolEditor() {
 
   const updateTopicTitle = (id: string, newTitle: string) => {
     setSessionItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, topic: newTitle } : item
-      )
+      items.map((item) => (item.id === id ? { ...item, topic: newTitle } : item))
     );
   };
 
@@ -322,9 +440,7 @@ export default function ProtocolEditor() {
   const addPoint = (topicId: string) => {
     setSessionItems((items) =>
       items.map((item) => {
-        if (item.id === topicId) {
-          return { ...item, points: [...item.points, ""] };
-        }
+        if (item.id === topicId) return { ...item, points: [...item.points, ""] };
         return item;
       })
     );
@@ -355,6 +471,19 @@ export default function ProtocolEditor() {
     );
   };
 
+  
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setSessionItems((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       {/* Header */}
@@ -372,12 +501,9 @@ export default function ProtocolEditor() {
             <button
               onClick={handlePasteFromClipboard}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors"
-              title="Aus Zwischenablage laden"
             >
-              <Clipboard size={16} />{" "}
-              <span className="hidden sm:inline">Clipboard</span>
+              <Clipboard size={16} /> <span className="hidden sm:inline">Clipboard</span>
             </button>
-
             <input
               type="file"
               accept=".yaml,.yml"
@@ -389,15 +515,13 @@ export default function ProtocolEditor() {
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
             >
-              <Upload size={16} />{" "}
-              <span className="hidden sm:inline">Import</span>
+              <Upload size={16} /> <span className="hidden sm:inline">Import</span>
             </button>
             <button
               onClick={handleExport}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors"
             >
-              <Save size={16} />{" "}
-              <span className="hidden sm:inline">Export</span>
+              <Save size={16} /> <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </div>
@@ -410,14 +534,12 @@ export default function ProtocolEditor() {
             <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
               <Users size={16} /> Anwesenheit
             </h2>
-
             <TagInput
               label="FSR Mitglieder (Gewählt)"
               selected={fsrMembers}
               setSelected={setFsrMembers}
               suggestions={ENV_FSR_MEMBERS}
             />
-
             <TagInput
               label="Weitere Personen (Assoziierte / Gäste)"
               selected={guests}
@@ -518,81 +640,39 @@ export default function ProtocolEditor() {
             </button>
           </div>
 
-          <div className="space-y-6">
-            {sessionItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden group"
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="space-y-6">
+              <SortableContext
+                items={sessionItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
               >
-                {/* Topic Header */}
-                <div className="bg-slate-50 p-4 border-b border-slate-100 flex gap-4 items-center">
-                  <div className="cursor-grab text-slate-400">
-                    <div className="w-1.5 h-8 bg-slate-300 rounded-full"></div>
-                  </div>
-                  <input
-                    type="text"
-                    value={item.topic}
-                    onChange={(e) => updateTopicTitle(item.id, e.target.value)}
-                    className="flex-1 bg-transparent text-lg font-semibold text-slate-800 placeholder-slate-400 outline-none focus:underline decoration-indigo-300 underline-offset-4"
-                    placeholder="Thema Titel..."
+                {sessionItems.map((item) => (
+                  <SortableSessionItem
+                    key={item.id}
+                    item={item}
+                    updateTopicTitle={updateTopicTitle}
+                    removeTopic={removeTopic}
+                    addPoint={addPoint}
+                    updatePoint={updatePoint}
+                    removePoint={removePoint}
                   />
-                  <button
-                    onClick={() => removeTopic(item.id)}
-                    className="text-slate-400 hover:text-red-500 transition-colors p-2"
-                    title="Thema löschen"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+                ))}
+              </SortableContext>
 
-                {/* Bullet Points */}
-                <div className="p-4 space-y-3">
-                  {item.points.map((point, idx) => (
-                    <div
-                      key={idx}
-                      className="flex gap-3 items-start group/point"
-                    >
-                      <div className="mt-3.5 w-1.5 h-1.5 bg-indigo-500 rounded-full shrink-0"></div>
-                      <textarea
-                        value={point}
-                        onChange={(e) =>
-                          updatePoint(item.id, idx, e.target.value)
-                        }
-                        className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 outline-none py-1 text-slate-600 leading-relaxed"
-                        rows={
-                          point == null || point === ""
-                            ? 1
-                            : Math.max(1, Math.ceil(point.length / 80))
-                        }
-                        placeholder="Inhalt des Tagesordnungspunkts..."
-                      />
-                      <button
-                        onClick={() => removePoint(item.id, idx)}
-                        className="opacity-0 group-hover/point:opacity-100 text-slate-300 hover:text-red-400 transition-all p-1"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => addPoint(item.id)}
-                    className="ml-5 text-sm text-slate-400 hover:text-indigo-600 flex items-center gap-1 mt-2"
-                  >
-                    <Plus size={14} /> Punkt hinzufügen
-                  </button>
+              {sessionItems.length === 0 && (
+                <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 text-slate-400">
+                  <p>
+                    Keine Themen vorhanden. Füge ein Thema hinzu oder importiere
+                    ein Protokoll.
+                  </p>
                 </div>
-              </div>
-            ))}
-
-            {sessionItems.length === 0 && (
-              <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 text-slate-400">
-                <p>
-                  Keine Themen vorhanden. Füge ein Thema hinzu oder importiere
-                  ein Protokoll.
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </DndContext>
         </section>
       </main>
     </div>
