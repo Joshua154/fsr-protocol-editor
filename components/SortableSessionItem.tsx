@@ -41,17 +41,17 @@ export const SortableSessionItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-xl shadow-sm border overflow-hidden group transition-shadow ${
-        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200"
+      className={`bg-white dark:bg-slate-900 rounded-xl shadow-md border overflow-hidden group transition-shadow ${
+        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-slate-800 dark:shadow-white/50"
       }`}
     >
       {/* Topic Header */}
-      <div className="bg-slate-50 p-4 border-b border-slate-100 flex gap-4 items-center">
+      <div className="bg-slate-50 dark:bg-slate-950 p-4 border-b border-slate-100 dark:border-slate-800 flex gap-4 items-center">
         {/* Drag Handle */}
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-indigo-600 p-1"
+          className="cursor-grab active:cursor-grabbing text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 p-1"
           title="Ziehen zum Sortieren"
         >
           <GripVertical size={20} />
@@ -61,13 +61,13 @@ export const SortableSessionItem = ({
           type="text"
           value={item.topic}
           onChange={(e) => updateTopicTitle(item.id, e.target.value)}
-          className="flex-1 bg-transparent text-lg font-semibold text-slate-800 placeholder-slate-400 outline-none focus:underline decoration-indigo-300 underline-offset-4"
+          className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
           placeholder="Thema Titel..."
           onKeyDown={(e) => e.stopPropagation()} // Stop DND from interfering with typing
         />
         <button
           onClick={() => removeTopic(item.id)}
-          className="text-slate-400 hover:text-red-500 transition-colors p-2"
+          className="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors p-2"
           title="Thema löschen"
         >
           <Trash2 size={18} />
@@ -82,7 +82,7 @@ export const SortableSessionItem = ({
             <textarea
               value={point}
               onChange={(e) => updatePoint(item.id, idx, e.target.value)}
-              className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 outline-none py-1 text-slate-600 leading-relaxed"
+              className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 dark:focus:border-indigo-800 outline-none py-1 text-slate-600 dark:text-slate-300 leading-relaxed"
               rows={
                 point == null || point === ""
                   ? 1
@@ -93,7 +93,7 @@ export const SortableSessionItem = ({
             />
             <button
               onClick={() => removePoint(item.id, idx)}
-              className="opacity-0 group-hover/point:opacity-100 text-slate-300 hover:text-red-400 transition-all p-1"
+              className="opacity-0 group-hover/point:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-400 dark:hover:text-red-400 transition-all p-1"
             >
               <Trash2 size={14} />
             </button>
@@ -101,7 +101,7 @@ export const SortableSessionItem = ({
         ))}
         <button
           onClick={() => addPoint(item.id)}
-          className="ml-5 text-sm text-slate-400 hover:text-indigo-600 flex items-center gap-1 mt-2"
+          className="ml-5 text-sm text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
         >
           <Plus size={14} /> Punkt hinzufügen
         </button>
