@@ -7,7 +7,7 @@ export const sessionObjectToArray = (
   return Object.entries(sitzung).map(([topic, points], index) => ({
     id: `topic-${index}-${Date.now()}`,
     topic,
-    points: Array.isArray(points) ? points.map(String) : [String(points)],
+    points: (Array.isArray(points) ? points : [points]).map(String).filter((a) => a !== "null"),
   }));
 };
 
