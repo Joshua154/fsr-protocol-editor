@@ -218,6 +218,7 @@ export default function ProtocolEditor() {
       };
 
       setFsrMembers(parseList(parsed.FSR));
+      setProtocolant(parsed.Protokollant ? [String(parsed.Protokollant)] : []);
       setGuests(parseList(parsed.WeiterePersonen));
 
       setMeta({
@@ -274,7 +275,7 @@ export default function ProtocolEditor() {
   const handleExport = () => {
     const dataToExport = {
       FSR: fsrMembers,
-      Protokollant: protocolant,
+      Protokollant: protocolant[0] || "",
       WeiterePersonen: guests,
       Date: meta.Date,
       Start: meta.Start,
