@@ -90,7 +90,11 @@ export const useProtocol = () => {
     const yamlString = yaml.dump(dataToExport, {
       lineWidth: -1,
       noRefs: true,
-      replacer: (_key, value) => (value === null ? "" : value),
+      replacer: (_key, value) => (
+            value === null ? "" : 
+            value === "'" ? "\'" : 
+            value
+          ),
     });
 
     const blob = new Blob([yamlString], { type: "text/yaml" });
