@@ -195,7 +195,6 @@ export default function ProtocolEditor() {
   const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const processYamlContent = (content: string) => {
     try {
       const parsed = yaml.load(content) as ProtocolData;
@@ -237,7 +236,6 @@ export default function ProtocolEditor() {
     }
   };
 
-
   // File Upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -268,7 +266,6 @@ export default function ProtocolEditor() {
       );
     }
   };
-
 
   // Export YAML
   const handleExport = () => {
@@ -402,7 +399,7 @@ export default function ProtocolEditor() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+      <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {/* Meta Data Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2 space-y-5">
@@ -443,11 +440,22 @@ export default function ProtocolEditor() {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">
-                  Start
+                  Start{" "}
+                  <button
+                    className="text-indigo-600 font-medium hover:text-indigo-800"
+                    onClick={() =>
+                      setMeta({
+                        ...meta,
+                        Start: new Date().toISOString().slice(11, 19),
+                      })
+                    }
+                  >
+                    jetzt
+                  </button>
                 </label>
                 <input
                   type="time"
-                  // step="1"
+                  step="1"
                   value={meta.Start}
                   onChange={(e) => setMeta({ ...meta, Start: e.target.value })}
                   className="w-full p-2 bg-slate-50 border border-slate-200 rounded-md"
@@ -455,11 +463,22 @@ export default function ProtocolEditor() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">
-                  Ende
+                  Ende{" "}
+                  <button
+                    className="text-indigo-600 font-medium hover:text-indigo-800"
+                    onClick={() =>
+                      setMeta({
+                        ...meta,
+                        Ende: new Date().toISOString().slice(11, 19),
+                      })
+                    }
+                  >
+                    jetzt
+                  </button>
                 </label>
                 <input
                   type="time"
-                  // step="1"
+                  step="1"
                   value={meta.Ende}
                   onChange={(e) => setMeta({ ...meta, Ende: e.target.value })}
                   className="w-full p-2 bg-slate-50 border border-slate-200 rounded-md"
