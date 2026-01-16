@@ -65,7 +65,29 @@ export const useProtocol = () => {
     e.target.value = "";
   };
 
+  const handleImportFileClick = () => {
+    if (sessionItems.length > 0) {
+      if (
+        !window.confirm(
+          "Das Importieren eines Protokolls überschreibt alle aktuellen Daten. Fortfahren?"
+        )
+      ) {
+        return;
+      }
+    }
+    fileInputRef.current?.click();
+  };
+
   const handlePasteFromClipboard = async () => {
+    if (sessionItems.length > 0) {
+      if (
+        !window.confirm(
+          "Das Einfügen aus der Zwischenablage überschreibt alle aktuellen Daten. Fortfahren?"
+        )
+      ) {
+        return;
+      }
+    }
     try {
       const text = await navigator.clipboard.readText();
       if (!text) return alert("Zwischenablage ist leer!");
@@ -183,6 +205,7 @@ export const useProtocol = () => {
     setSessionItems,
     fileInputRef,
     handleFileUpload,
+    handleImportFileClick,
     handlePasteFromClipboard,
     handleExport,
     addTopic,

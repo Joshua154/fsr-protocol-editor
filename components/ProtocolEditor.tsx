@@ -42,6 +42,7 @@ export function ProtocolEditor({
     sessionItems,
     fileInputRef,
     handleFileUpload,
+    handleImportFileClick,
     handlePasteFromClipboard,
     handleExport,
     addTopic,
@@ -70,6 +71,7 @@ export function ProtocolEditor({
         handlePasteFromClipboard={handlePasteFromClipboard}
         fileInputRef={fileInputRef}
         handleFileUpload={handleFileUpload}
+        handleImportFileClick={handleImportFileClick}
         handleExport={handleExport}
       />
 
