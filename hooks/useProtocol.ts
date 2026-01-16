@@ -1,11 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import yaml from "js-yaml";
 import { SessionItem, ProtocolData } from "@/common/types";
 import { sessionObjectToArray, sessionArrayToObject } from "@/common/utils";
 import { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 
+const STORAGE_KEY = "fsr-protocol-data";
+
 export const useProtocol = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [fsrMembers, setFsrMembers] = useState<string[]>([]);
   const [guests, setGuests] = useState<string[]>([]);
   const [protocolant, setProtocolant] = useState<string[]>([]);
@@ -17,6 +20,63 @@ export const useProtocol = () => {
   });
   const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load from LocalStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setFsrMembers(parsed.fsrMembers || []);
+        setGuests(parsed.guests || []);
+        setProtocolant(parsed.protocolant || []);
+        setMeta(
+          parsed.meta || {
+            Date: new Date().toISOString().split("T")[0],
+            Start: "16:30",
+            Ende: "17:30",
+          }
+        );
+        setSessionItems(parsed.sessionItems || []);
+      } catch (e) {
+        console.error("Failed to load protocol data", e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to LocalStorage on change
+  useEffect(() => {
+    if (!isLoaded) return;
+    const dataToSave = {
+      fsrMembers,
+      guests,
+      protocolant,
+      meta,
+      sessionItems,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+  }, [fsrMembers, guests, protocolant, meta, sessionItems, isLoaded]);
+
+  const resetProtocol = () => {
+    if (
+      !window.confirm(
+        "Möchtest du das Protokoll wirklich zurücksetzen? Alle ungespeicherten Daten gehen verloren."
+      )
+    ) {
+      return;
+    }
+    localStorage.removeItem(STORAGE_KEY);
+    setFsrMembers([]);
+    setGuests([]);
+    setProtocolant([]);
+    setMeta({
+      Date: new Date().toISOString().split("T")[0],
+      Start: "16:30",
+      Ende: "17:30",
+    });
+    setSessionItems([]);
+  };
 
   const processYamlContent = (content: string) => {
     try {
@@ -215,5 +275,6 @@ export const useProtocol = () => {
     updatePoint,
     removePoint,
     handleDragEnd,
+    resetProtocol,
   };
 };
