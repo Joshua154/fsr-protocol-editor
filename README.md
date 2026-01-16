@@ -76,8 +76,8 @@ A web-based editor for managing and generating protocols for Student Council (FS
 
     Edit `.env.local` to set your default FSR members and associated members:
     ```env
-    NEXT_PUBLIC_FSR_MEMBERS=Member1,Member2,Member3
-    NEXT_PUBLIC_ASSOCIATED_MEMBERS=Guest1,Guest2
+    FSR_MEMBERS=Member1,Member2,Member3
+    ASSOCIATED_MEMBERS=Guest1,Guest2
     ```
 
 4.  Run the development server:
@@ -86,3 +86,35 @@ A web-based editor for managing and generating protocols for Student Council (FS
     ```
 
 5.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Running with Docker
+
+You can also run the application using Docker. This is useful for deployment or testing in a clean environment.
+
+1.  **Configure Environment Variables**:
+    You can set environment variables in `docker-compose.yml` or use an `.env.local` file.
+    
+    ```env
+    FSR_MEMBERS="Alice,Bob,Charlie"
+    ASSOCIATED_MEMBERS="Dave,Eve"
+    ```
+
+2.  **Start the Container**:
+    ```bash
+    docker compose up -d --build
+    ```
+    or use this example
+    ```yaml
+    services:
+        editor:
+            image: ghcr.io/joshua154/fsr-protocol-editor:main
+            container_name: fsr-protocol-editor
+            ports:
+            - "3000:3000"
+            env_file:
+            - .env.local
+    ```
+
+    ```bash
+    docker compose up -d
+    ```
