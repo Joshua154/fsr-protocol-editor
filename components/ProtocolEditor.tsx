@@ -52,6 +52,7 @@ export function ProtocolEditor({
     updatePoint,
     removePoint,
     handleDragEnd,
+    resetProtocol,
   } = useProtocol();
 
   const sensors = useSensors(
@@ -73,6 +74,7 @@ export function ProtocolEditor({
         handleFileUpload={handleFileUpload}
         handleImportFileClick={handleImportFileClick}
         handleExport={handleExport}
+        resetProtocol={resetProtocol}
       />
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
