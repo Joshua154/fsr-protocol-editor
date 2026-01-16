@@ -1,13 +1,14 @@
 import React from "react";
 import { Users, Calendar } from "lucide-react";
 import { TagInput } from "./TagInput";
-import { ENV_FSR_MEMBERS, ENV_ASSOC_MEMBERS } from "@/common/constants";
 
 interface MetaSectionProps {
   fsrMembers: string[];
   setFsrMembers: (val: string[]) => void;
+  availableFsrMembers: string[];
   guests: string[];
   setGuests: (val: string[]) => void;
+  availableAssocMembers: string[];
   protocolant: string[];
   setProtocolant: (val: string[]) => void;
   meta: { Date: string; Start: string; Ende: string };
@@ -17,8 +18,10 @@ interface MetaSectionProps {
 export const MetaSection = ({
   fsrMembers,
   setFsrMembers,
+  availableFsrMembers,
   guests,
   setGuests,
+  availableAssocMembers,
   protocolant,
   setProtocolant,
   meta,
@@ -34,13 +37,13 @@ export const MetaSection = ({
           label="FSR Mitglieder (Gewählt)"
           selected={fsrMembers}
           setSelected={setFsrMembers}
-          suggestions={ENV_FSR_MEMBERS}
+          suggestions={availableFsrMembers}
         />
         <TagInput
           label="Weitere Personen (Assoziierte / Gäste)"
           selected={guests}
           setSelected={setGuests}
-          suggestions={ENV_ASSOC_MEMBERS}
+          suggestions={availableAssocMembers}
         />
       </div>
       <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 space-y-4 dark:shadow-white/50">
@@ -116,7 +119,7 @@ export const MetaSection = ({
             label=""
             selected={protocolant}
             setSelected={setProtocolant}
-            suggestions={ENV_FSR_MEMBERS}
+            suggestions={availableFsrMembers}
             maxSelections={1}
           />
         </div>
