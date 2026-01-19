@@ -1,14 +1,15 @@
 import React from "react";
 import { Users, Calendar } from "lucide-react";
 import { TagInput } from "./TagInput";
+import { Member } from "@/common/types";
 
 interface MetaSectionProps {
   fsrMembers: string[];
   setFsrMembers: (val: string[]) => void;
-  availableFsrMembers: string[];
+  availableFsrMembers: Member[];
   guests: string[];
   setGuests: (val: string[]) => void;
-  availableAssocMembers: string[];
+  availableAssocMembers: Member[];
   protocolant: string[];
   setProtocolant: (val: string[]) => void;
   meta: { Date: string; Start: string; Ende: string };

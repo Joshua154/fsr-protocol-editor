@@ -20,10 +20,11 @@ import { useProtocol } from "@/hooks/useProtocol";
 import { Header } from "@/components/Header";
 import { MetaSection } from "@/components/MetaSection";
 import { SortableSessionItem } from "@/components/SortableSessionItem";
+import { Member } from "@/common/types";
 
 interface ProtocolEditorProps {
-  availableFsrMembers: string[];
-  availableAssocMembers: string[];
+  availableFsrMembers: Member[];
+  availableAssocMembers: Member[];
 }
 
 export function ProtocolEditor({
