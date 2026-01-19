@@ -42,7 +42,7 @@ export const SortableSessionItem = ({
       ref={setNodeRef}
       style={style}
       className={`bg-white dark:bg-slate-900 rounded-xl shadow-md border overflow-hidden group transition-shadow ${
-        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-slate-800 dark:shadow-white/50"
+        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-slate-800 dark:shadow-slate-700"
       }`}
     >
       {/* Topic Header */}
