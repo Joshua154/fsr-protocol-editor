@@ -1,4 +1,4 @@
-import { SessionItem } from "./types";
+import { SessionItem, EnvVariables, Member } from "./types";
 
 export const sessionObjectToArray = (
   sitzung: Record<string, unknown>
@@ -20,3 +20,37 @@ export const sessionArrayToObject = (items: SessionItem[]) => {
   });
   return obj;
 };
+
+
+const ENV = process.env as EnvVariables;
+
+const parseMembers = (value?: string | Member[]): Member[] => {
+  if (!value) return [];
+
+  if (typeof value === "string") {
+    return value.split(/,(?![^\[]*\])/).map((entry) => {
+      
+      const match = entry.match(/^(.*?)\s*\[(.*?)\]\s*$/);
+      
+      if (match) {
+        const name = match[1].trim();
+        const aliases = match[2].split(",").map((a) => a.trim()).filter(Boolean);
+        return { name, aliases };
+      }
+      return { name: entry.trim(), aliases: [] };
+    }).filter((m) => m.name.length > 0);
+  }
+
+  return value.map((m) => ({
+    name: (m?.name ?? "").trim(),
+    aliases: m.aliases || [],
+  })).filter((m) => m.name.length > 0);
+};
+
+export function getFSRMembers(): Member[] {
+  return parseMembers(ENV.FSR_MEMBERS);
+}
+
+export function getAssociatedMembers(): Member[] {
+  return parseMembers(ENV.ASSOCIATED_MEMBERS);
+}

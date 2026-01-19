@@ -15,3 +15,13 @@ export type ProtocolData = {
   Sitzung: Record<string, string[]>;
   [key: string]: unknown;
 };
+
+export type Member = {
+  name: string;
+  aliases?: string[];
+};
+
+export type EnvVariables = {
+  FSR_MEMBERS?: Member[] | string;
+  ASSOCIATED_MEMBERS?: Member[] | string;
+};

@@ -95,9 +95,10 @@ You can also run the application using Docker. This is useful for deployment or 
     You can set environment variables in `docker-compose.yml` or use an `.env.local` file.
     
     ```env
-    FSR_MEMBERS="Alice,Bob,Charlie"
-    ASSOCIATED_MEMBERS="Dave,Eve"
+    FSR_MEMBERS="Alice [Ali, A], Bob, Charlie"
+    ASSOCIATED_MEMBERS="Dave [David], Eve"
     ```
+    You can define aliases for members using brackets `[]`. Searching for "Ali" will suggest "Alice".
 
 2.  **Start the Container**:
     ```bash

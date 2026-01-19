@@ -1,11 +1,12 @@
 import React, { useState, useRef, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
+import { Member } from "@/common/types";
 
 interface TagInputProps {
   label: string;
   selected: string[];
   setSelected: (val: string[]) => void;
-  suggestions: string[];
+  suggestions: Member[];
   maxSelections?: number;
 }
 
@@ -20,10 +21,14 @@ export const TagInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const availableOptions = suggestions.filter(
-    (s) =>
-      !selected.includes(s) && s.toLowerCase().includes(input.toLowerCase())
-  );
+  const availableOptions = suggestions.filter((member) => {
+    if (selected.includes(member.name)) return false;
+    const lowerInput = input.toLowerCase();
+    return (
+      member.name.toLowerCase().includes(lowerInput) ||
+      member.aliases?.some((alias) => alias.toLowerCase().includes(lowerInput))
+    );
+  });
 
   const addTag = (tag: string) => {
     if (maxSelections !== -1 && selected.length >= maxSelections) return;
@@ -79,16 +84,23 @@ export const TagInput = ({
           availableOptions.length > 0 &&
           (maxSelections === -1 || selected.length < maxSelections) && (
             <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
-              {availableOptions.map((option) => (
+              {availableOptions.map((member) => (
                 <button
-                  key={option}
+                  key={member.name}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    addTag(option);
+                    addTag(member.name);
                   }}
                   className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
                 >
-                  {option}
+                  <div className="flex flex-col">
+                    <span>{member.name}</span>
+                    {member.aliases && member.aliases.length > 0 && (
+                      <span className="text-xs text-slate-400">
+                        {member.aliases.join(", ")}
+                      </span>
+                    )}
+                  </div>
                   <Plus size={14} className="text-slate-400 dark:text-slate-500" />
                 </button>
               ))}
