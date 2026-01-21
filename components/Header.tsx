@@ -34,14 +34,14 @@ export const Header = ({
           <ThemeToggle />
           <button
             onClick={resetProtocol}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-transparent rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-transparent rounded-lg transition-colors"
             title="Protokoll zurücksetzen"
           >
             <RotateCcw size={16} /> <span className="hidden sm:inline">Reset</span>
           </button>
           <button
             onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
             <Clipboard size={16} />{" "}
             <span className="hidden sm:inline">Clipboard</span>
@@ -55,13 +55,13 @@ export const Header = ({
           />
           <button
             onClick={handleImportFileClick}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
           >
             <Upload size={16} /> <span className="hidden sm:inline">Import</span>
           </button>
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
           >
             <Save size={16} /> <span className="hidden sm:inline">Export</span>
           </button>
