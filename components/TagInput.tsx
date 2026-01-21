@@ -56,7 +56,7 @@ export const TagInput = ({
 
   return (
     <div className="relative group">
-      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+      <label className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-1">
         {label}
       </label>
       <div
@@ -66,7 +66,7 @@ export const TagInput = ({
         {selected.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
+            className="flex items-center gap-1 px-2 py-1 text-md bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
           >
             {tag}
             <button
@@ -91,12 +91,12 @@ export const TagInput = ({
                     e.preventDefault();
                     addTag(member.name);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
+                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
                 >
                   <div className="flex flex-col">
                     <span>{member.name}</span>
                     {member.aliases && member.aliases.length > 0 && (
-                      <span className="text-xs text-slate-400">
+                      <span className="text-sm text-slate-400">
                         {member.aliases.join(", ")}
                       </span>
                     )}
@@ -119,7 +119,7 @@ export const TagInput = ({
             onBlur={() => setTimeout(() => setIsOpen(false), 50)}
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent outline-none text-sm h-full py-1 text-slate-700 dark:text-slate-200"
+            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-slate-200"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
           />
         </div>

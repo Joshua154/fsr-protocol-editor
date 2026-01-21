@@ -101,7 +101,7 @@ export const SortableSessionItem = ({
         ))}
         <button
           onClick={() => addPoint(item.id)}
-          className="ml-5 text-sm text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
+          className="ml-5 text-md text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
         >
           <Plus size={14} /> Punkt hinzufügen
         </button>
