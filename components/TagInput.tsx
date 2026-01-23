@@ -1,11 +1,12 @@
 import React, { useState, useRef, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
+import { Member } from "@/common/types";
 
 interface TagInputProps {
   label: string;
   selected: string[];
   setSelected: (val: string[]) => void;
-  suggestions: string[];
+  suggestions: Member[];
   maxSelections?: number;
 }
 
@@ -20,10 +21,14 @@ export const TagInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const availableOptions = suggestions.filter(
-    (s) =>
-      !selected.includes(s) && s.toLowerCase().includes(input.toLowerCase())
-  );
+  const availableOptions = suggestions.filter((member) => {
+    if (selected.includes(member.name)) return false;
+    const lowerInput = input.toLowerCase();
+    return (
+      member.name.toLowerCase().includes(lowerInput) ||
+      member.aliases?.some((alias) => alias.toLowerCase().includes(lowerInput))
+    );
+  });
 
   const addTag = (tag: string) => {
     if (maxSelections !== -1 && selected.length >= maxSelections) return;
@@ -51,7 +56,7 @@ export const TagInput = ({
 
   return (
     <div className="relative group">
-      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+      <label className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-1">
         {label}
       </label>
       <div
@@ -61,7 +66,7 @@ export const TagInput = ({
         {selected.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
+            className="flex items-center gap-1 px-2 py-1 text-md bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
           >
             {tag}
             <button
@@ -79,16 +84,23 @@ export const TagInput = ({
           availableOptions.length > 0 &&
           (maxSelections === -1 || selected.length < maxSelections) && (
             <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
-              {availableOptions.map((option) => (
+              {availableOptions.map((member) => (
                 <button
-                  key={option}
+                  key={member.name}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    addTag(option);
+                    addTag(member.name);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
+                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
                 >
-                  {option}
+                  <div className="flex flex-col">
+                    <span>{member.name}</span>
+                    {member.aliases && member.aliases.length > 0 && (
+                      <span className="text-sm text-slate-400">
+                        {member.aliases.join(", ")}
+                      </span>
+                    )}
+                  </div>
                   <Plus size={14} className="text-slate-400 dark:text-slate-500" />
                 </button>
               ))}
@@ -107,7 +119,7 @@ export const TagInput = ({
             onBlur={() => setTimeout(() => setIsOpen(false), 50)}
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent outline-none text-sm h-full py-1 text-slate-700 dark:text-slate-200"
+            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-slate-200"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
           />
         </div>

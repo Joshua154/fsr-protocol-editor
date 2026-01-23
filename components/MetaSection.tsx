@@ -1,14 +1,15 @@
 import React from "react";
 import { Users, Calendar } from "lucide-react";
 import { TagInput } from "./TagInput";
+import { Member } from "@/common/types";
 
 interface MetaSectionProps {
   fsrMembers: string[];
   setFsrMembers: (val: string[]) => void;
-  availableFsrMembers: string[];
+  availableFsrMembers: Member[];
   guests: string[];
   setGuests: (val: string[]) => void;
-  availableAssocMembers: string[];
+  availableAssocMembers: Member[];
   protocolant: string[];
   setProtocolant: (val: string[]) => void;
   meta: { Date: string; Start: string; Ende: string };
@@ -29,8 +30,8 @@ export const MetaSection = ({
 }: MetaSectionProps) => {
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 col-span-2 space-y-5 dark:shadow-white/50">
-        <h2 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 col-span-2 space-y-5 dark:shadow-slate-700">
+        <h2 className="text-md font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
           <Users size={16} /> Anwesenheit
         </h2>
         <TagInput
@@ -46,12 +47,12 @@ export const MetaSection = ({
           suggestions={availableAssocMembers}
         />
       </div>
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 space-y-4 dark:shadow-white/50">
-        <h2 className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 space-y-4 dark:shadow-slate-700">
+        <h2 className="text-md font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <Calendar size={16} /> Details
         </h2>
         <div>
-          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
             Datum
           </label>
           <input
@@ -63,7 +64,7 @@ export const MetaSection = ({
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
               Start{" "}
               <button
                 type="button"
@@ -87,7 +88,7 @@ export const MetaSection = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
               Ende{" "}
               <button
                 type="button"
@@ -112,7 +113,7 @@ export const MetaSection = ({
           </div>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">
+          <label className="block text-sm font-medium text-slate-500 mb-1">
             Protokollant:in
           </label>
           <TagInput

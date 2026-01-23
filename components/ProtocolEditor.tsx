@@ -20,10 +20,11 @@ import { useProtocol } from "@/hooks/useProtocol";
 import { Header } from "@/components/Header";
 import { MetaSection } from "@/components/MetaSection";
 import { SortableSessionItem } from "@/components/SortableSessionItem";
+import { Member } from "@/common/types";
 
 interface ProtocolEditorProps {
-  availableFsrMembers: string[];
-  availableAssocMembers: string[];
+  availableFsrMembers: Member[];
+  availableAssocMembers: Member[];
 }
 
 export function ProtocolEditor({
@@ -99,7 +100,7 @@ export function ProtocolEditor({
             </h2>
             <button
               onClick={addTopic}
-              className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
+              className="flex items-center gap-1 text-md text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
             >
               <Plus size={16} /> Neues Thema
             </button>
