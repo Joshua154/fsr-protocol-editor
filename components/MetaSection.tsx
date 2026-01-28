@@ -72,7 +72,7 @@ export const MetaSection = ({
                 onClick={() =>
                   setMeta({
                     ...meta,
-                    Start: new Date().toISOString().slice(11, 19),
+                    Start: new Date().toLocaleString().slice(11, 19),
                   })
                 }
               >
@@ -96,7 +96,7 @@ export const MetaSection = ({
                 onClick={() =>
                   setMeta({
                     ...meta,
-                    Ende: new Date().toISOString().slice(11, 19),
+                    Ende: new Date().toLocaleString().slice(11, 19),
                   })
                 }
               >
