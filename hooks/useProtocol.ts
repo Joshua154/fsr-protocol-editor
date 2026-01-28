@@ -169,7 +169,7 @@ export const useProtocol = () => {
       Sitzung: sessionArrayToObject(sessionItems),
     };
 
-    const yamlString = yaml.dump(dataToExport, {
+    let yamlString = yaml.dump(dataToExport, {
       lineWidth: -1,
       noRefs: true,
       replacer: (_key, value) => (
@@ -178,6 +178,8 @@ export const useProtocol = () => {
             value
           ),
     });
+
+    yamlString = yamlString.replace(/^(Date|Start|Ende):\s*'(.+?)'/gm, "$1: $2");
 
     const blob = new Blob([yamlString], { type: "text/yaml" });
     const url = URL.createObjectURL(blob);
