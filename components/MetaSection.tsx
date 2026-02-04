@@ -16,6 +16,14 @@ interface MetaSectionProps {
   setMeta: (val: { Date: string; Start: string; Ende: string }) => void;
 }
 
+const getCurrentTimeString = (): string => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const seconds = now.getSeconds().toString().padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 export const MetaSection = ({
   fsrMembers,
   setFsrMembers,
@@ -72,7 +80,7 @@ export const MetaSection = ({
                 onClick={() =>
                   setMeta({
                     ...meta,
-                    Start: new Date().toLocaleString().slice(11, 19),
+                    Start: getCurrentTimeString(),
                   })
                 }
               >
@@ -83,7 +91,7 @@ export const MetaSection = ({
               type="time"
               step="1"
               value={meta.Start}
-              onChange={(e) => setMeta({ ...meta, Start: e.target.value })}
+              onChange={(e) => {console.log(e.target.value); setMeta({ ...meta, Start: e.target.value })}}
               className="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
             />
           </div>
@@ -96,7 +104,7 @@ export const MetaSection = ({
                 onClick={() =>
                   setMeta({
                     ...meta,
-                    Ende: new Date().toLocaleString().slice(11, 19),
+                    Ende: getCurrentTimeString(),
                   })
                 }
               >
