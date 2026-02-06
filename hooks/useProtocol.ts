@@ -4,6 +4,7 @@ import { SessionItem, ProtocolData } from "@/common/types";
 import { sessionObjectToArray, sessionArrayToObject } from "@/common/utils";
 import { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { sendToDiscord } from "@/app/actions";
 
 const STORAGE_KEY = "fsr-protocol-data";
 
@@ -191,6 +192,41 @@ export const useProtocol = () => {
     document.body.removeChild(a);
   };
 
+  const handleSendToDiscord = async () => {
+    if (
+      !window.confirm(
+        "Send to Discord?"
+      )
+    ) {
+      return;
+    }
+
+    const dataToExport = {
+      FSR: fsrMembers,
+      Protokollant: protocolant[0] || "",
+      WeiterePersonen: guests,
+      Date: meta.Date,
+      Start: meta.Start,
+      Ende: meta.Ende,
+      Sitzung: sessionArrayToObject(sessionItems),
+    };
+
+    const yamlString = yaml.dump(dataToExport, {
+      lineWidth: -1,
+      noRefs: true,
+      replacer: (_key, value) =>
+        value === null ? "" : value === "'" ? "'" : value,
+    });
+
+    const result = await sendToDiscord(yamlString, meta.Date || "Export");
+    
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert("Fehler: " + result.message);
+    }
+  };
+
   const addTopic = () => {
     setSessionItems([
       ...sessionItems,
@@ -270,6 +306,7 @@ export const useProtocol = () => {
     handleImportFileClick,
     handlePasteFromClipboard,
     handleExport,
+    handleSendToDiscord,
     addTopic,
     updateTopicTitle,
     removeTopic,

@@ -46,6 +46,7 @@ export function ProtocolEditor({
     handleImportFileClick,
     handlePasteFromClipboard,
     handleExport,
+    handleSendToDiscord,
     addTopic,
     updateTopicTitle,
     removeTopic,
@@ -75,6 +76,7 @@ export function ProtocolEditor({
         handleFileUpload={handleFileUpload}
         handleImportFileClick={handleImportFileClick}
         handleExport={handleExport}
+        handleSendToDiscord={handleSendToDiscord}
         resetProtocol={resetProtocol}
       />
 
