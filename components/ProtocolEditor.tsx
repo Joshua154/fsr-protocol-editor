@@ -68,7 +68,7 @@ export function ProtocolEditor({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-background text-slate-900 dark:text-foreground font-sans pb-20">
       <Header
         handlePasteFromClipboard={handlePasteFromClipboard}
         fileInputRef={fileInputRef}
@@ -95,12 +95,12 @@ export function ProtocolEditor({
         {/* Meeting Content */}
         <section>
           <div className="flex justify-between items-end mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-foreground">
               Sitzungsinhalte
             </h2>
             <button
               onClick={addTopic}
-              className="flex items-center gap-1 text-md text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
+              className="flex items-center gap-1 text-sm text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
             >
               <Plus size={16} /> Neues Thema
             </button>
@@ -130,7 +130,7 @@ export function ProtocolEditor({
               </SortableContext>
 
               {sessionItems.length === 0 && (
-                <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-border text-slate-400 dark:text-muted-foreground">
                   <p>
                     Keine Themen vorhanden. Füge ein Thema hinzu oder importiere
                     ein Protokoll.

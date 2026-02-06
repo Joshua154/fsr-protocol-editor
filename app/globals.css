@@ -47,39 +47,39 @@
 
 /* Dark Mode Override */
 .dark {
-  /* --- Dark Mode (Slate 950 Base) --- */
-  --background: #020617; /* Deep Slate */
-  --foreground: #f8fafc; /* Slate 50 */
+  /* --- Dark Mode (Real Black Base) --- */
+  --background: #000000;
+  --foreground: #ededed;
 
-  --card: #020617;
-  --card-foreground: #f8fafc;
+  --card: #000000;
+  --card-foreground: #ededed;
 
-  --popover: #020617;
-  --popover-foreground: #f8fafc;
+  --popover: #000000;
+  --popover-foreground: #ededed;
 
-  /* Indigo 500 (Brighter for dark mode) */
-  --primary: #6366f1;
+  /* Indigo 400 */
+  --primary: #818cf8;
   --primary-foreground: #ffffff;
 
-  /* Slate 800 */
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
+  /* Zinc 900 */
+  --secondary: #18181b;
+  --secondary-foreground: #ededed;
 
-  /* Slate 800 */
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8; /* Slate 400 */
+  /* Zinc 900 */
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa; /* Zinc 400 */
 
-  /* Slate 800 */
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
+  /* Zinc 900 */
+  --accent: #18181b;
+  --accent-foreground: #ededed;
 
   /* Red 900 */
   --destructive: #7f1d1d;
-  --destructive-foreground: #f8fafc;
+  --destructive-foreground: #ededed;
 
-  /* Slate 800 */
-  --border: #1e293b;
-  --input: #1e293b;
+  /* Zinc 800 */
+  --border: #27272a;
+  --input: #27272a;
   
   /* Indigo 500 */
   --ring: #6366f1;
