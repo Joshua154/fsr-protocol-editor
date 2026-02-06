@@ -1,10 +1,20 @@
 "use server";
 
-export async function sendToDiscord(yamlContent: string, date: string) {
+export async function sendToDiscord(yamlContent: string, date: string, password?: string) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const configuredPassword = process.env.DISCORD_PASSWORD;
 
   if (!webhookUrl) {
     return { success: false, message: "Discord Webhook URL nicht konfiguriert." };
+  }
+
+  if (configuredPassword) {
+    if (!password) {
+      return { success: false, message: "Bitte Passwort eingeben." };
+    }
+    if (password !== configuredPassword) {
+      return { success: false, message: "Falsches Passwort." };
+    }
   }
 
   const formData = new FormData();

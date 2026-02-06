@@ -201,6 +201,9 @@ export const useProtocol = () => {
       return;
     }
 
+    const password = window.prompt("Bitte Passwort eingeben:");
+    if (password === null) return;
+
     const dataToExport = {
       FSR: fsrMembers,
       Protokollant: protocolant[0] || "",
@@ -218,7 +221,7 @@ export const useProtocol = () => {
         value === null ? "" : value === "'" ? "'" : value,
     });
 
-    const result = await sendToDiscord(yamlString, meta.Date || "Export");
+    const result = await sendToDiscord(yamlString, meta.Date || "Export", password);
     
     if (result.success) {
       alert(result.message);
