@@ -4,10 +4,13 @@ import { SessionItem, ProtocolData } from "@/common/types";
 import { sessionObjectToArray, sessionArrayToObject } from "@/common/utils";
 import { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { sendToDiscord } from "@/app/actions";
+import { useDialog } from "@/components/DialogProvider";
 
 const STORAGE_KEY = "fsr-protocol-data";
 
 export const useProtocol = () => {
+  const { confirm, alert, prompt } = useDialog();
   const [isLoaded, setIsLoaded] = useState(false);
   const [fsrMembers, setFsrMembers] = useState<string[]>([]);
   const [guests, setGuests] = useState<string[]>([]);
@@ -58,11 +61,12 @@ export const useProtocol = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
   }, [fsrMembers, guests, protocolant, meta, sessionItems, isLoaded]);
 
-  const resetProtocol = () => {
+  const resetProtocol = async () => {
     if (
-      !window.confirm(
-        "Möchtest du das Protokoll wirklich zurücksetzen? Alle ungespeicherten Daten gehen verloren."
-      )
+      !(await confirm(
+        "Möchtest du das Protokoll wirklich zurücksetzen? Alle ungespeicherten Daten gehen verloren.",
+        { destructive: true, title: "Protokoll zurücksetzen" }
+      ))
     ) {
       return;
     }
@@ -109,7 +113,10 @@ export const useProtocol = () => {
         setSessionItems([]);
       }
     } catch (error) {
-      alert("Fehler beim Lesen des YAMLs. Bitte Format prüfen.");
+      alert("Fehler beim Lesen des YAMLs. Bitte Format prüfen.", {
+        title: "Fehler",
+        destructive: true,
+      });
       console.error(error);
     }
   };
@@ -125,12 +132,13 @@ export const useProtocol = () => {
     e.target.value = "";
   };
 
-  const handleImportFileClick = () => {
+  const handleImportFileClick = async () => {
     if (sessionItems.length > 0) {
       if (
-        !window.confirm(
-          "Das Importieren eines Protokolls überschreibt alle aktuellen Daten. Fortfahren?"
-        )
+        !(await confirm(
+          "Das Importieren eines Protokolls überschreibt alle aktuellen Daten. Fortfahren?",
+          { title: "Importieren", destructive: true }
+        ))
       ) {
         return;
       }
@@ -141,9 +149,10 @@ export const useProtocol = () => {
   const handlePasteFromClipboard = async () => {
     if (sessionItems.length > 0) {
       if (
-        !window.confirm(
-          "Das Einfügen aus der Zwischenablage überschreibt alle aktuellen Daten. Fortfahren?"
-        )
+        !(await confirm(
+          "Das Einfügen aus der Zwischenablage überschreibt alle aktuellen Daten. Fortfahren?",
+          { title: "Einfügen", destructive: true }
+        ))
       ) {
         return;
       }
@@ -154,7 +163,7 @@ export const useProtocol = () => {
       processYamlContent(text);
     } catch (err) {
       console.error(err);
-      alert("Clipboard Zugriff verweigert.");
+      alert("Clipboard Zugriff verweigert!", { title: "Fehler", destructive: true });
     }
   };
 
@@ -189,6 +198,50 @@ export const useProtocol = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const handleSendToDiscord = async () => {
+    if (
+      !(await confirm(
+        "Möchtest du das Protokoll wirklich an Discord senden?",
+        { title: "An Discord senden" }
+      ))
+    ) {
+      return;
+    }
+
+    const passwordResult = await prompt("Bitte Passwort eingeben:", {
+      title: "Passwort benötigt",
+      hiddenInput: true,
+    });
+    if (passwordResult === null) return; // User cancelled
+
+    const password = typeof passwordResult === "string" ? passwordResult : undefined;
+
+    const dataToExport = {
+      FSR: fsrMembers,
+      Protokollant: protocolant[0] || "",
+      WeiterePersonen: guests,
+      Date: meta.Date,
+      Start: meta.Start,
+      Ende: meta.Ende,
+      Sitzung: sessionArrayToObject(sessionItems),
+    };
+
+    const yamlString = yaml.dump(dataToExport, {
+      lineWidth: -1,
+      noRefs: true,
+      replacer: (_key, value) =>
+        value === null ? "" : value === "'" ? "'" : value,
+    });
+
+    const result = await sendToDiscord(yamlString, meta.Date || "Export", password);
+    
+    if (result.success) {
+      await alert(result.message, { title: "Erfolg" });
+    } else {
+      await alert("Fehler: " + result.message, { title: "Fehler", destructive: true });
+    }
   };
 
   const addTopic = () => {
@@ -270,6 +323,7 @@ export const useProtocol = () => {
     handleImportFileClick,
     handlePasteFromClipboard,
     handleExport,
+    handleSendToDiscord,
     addTopic,
     updateTopicTitle,
     removeTopic,

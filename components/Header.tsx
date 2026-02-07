@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Clipboard, Upload, Save, RotateCcw } from "lucide-react";
+import { FileText, Clipboard, Upload, Save, RotateCcw, Send } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleImportFileClick: () => void;
   handleExport: () => void;
+  handleSendToDiscord: () => void;
   resetProtocol: () => void;
 }
 
@@ -17,16 +18,17 @@ export const Header = ({
   handleFileUpload,
   handleImportFileClick,
   handleExport,
+  handleSendToDiscord,
   resetProtocol,
 }: HeaderProps) => {
   return (
-    <header className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 transition-colors">
+    <header className="bg-white dark:bg-background border-b border-slate-200 dark:border-border sticky top-0 z-10 transition-colors">
       <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="bg-indigo-600 dark:bg-indigo-500 p-2 rounded-lg text-white">
             <FileText size={20} />
           </div>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-foreground">
             FSR Protokoll Editor
           </h1>
         </div>
@@ -41,7 +43,7 @@ export const Header = ({
           </button>
           <button
             onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
           >
             <Clipboard size={16} />{" "}
             <span className="hidden sm:inline">Clipboard</span>
@@ -55,7 +57,7 @@ export const Header = ({
           />
           <button
             onClick={handleImportFileClick}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
           >
             <Upload size={16} /> <span className="hidden sm:inline">Import</span>
           </button>
@@ -64,6 +66,13 @@ export const Header = ({
             className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
           >
             <Save size={16} /> <span className="hidden sm:inline">Export</span>
+          </button>
+          <button
+            onClick={handleSendToDiscord}
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
+            title="An Discord senden"
+          >
+            <Send size={16} /> <span className="hidden sm:inline">Discord</span>
           </button>
         </div>
       </div>

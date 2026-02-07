@@ -56,11 +56,11 @@ export const TagInput = ({
 
   return (
     <div className="relative group">
-      <label className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-1">
+      <label className="block text-md font-medium text-slate-700 dark:text-muted-foreground mb-1">
         {label}
       </label>
       <div
-        className="flex flex-wrap gap-2 p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-11.5 cursor-text"
+        className="flex flex-wrap gap-2 p-2 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-11.5 cursor-text"
         onClick={() => inputRef.current?.focus()}
       >
         {selected.map((tag) => (
@@ -83,7 +83,7 @@ export const TagInput = ({
         {isOpen &&
           availableOptions.length > 0 &&
           (maxSelections === -1 || selected.length < maxSelections) && (
-            <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+            <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
               {availableOptions.map((member) => (
                 <button
                   key={member.name}
@@ -91,17 +91,17 @@ export const TagInput = ({
                     e.preventDefault();
                     addTag(member.name);
                   }}
-                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 flex justify-between items-center"
+                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center"
                 >
                   <div className="flex flex-col">
                     <span>{member.name}</span>
                     {member.aliases && member.aliases.length > 0 && (
-                      <span className="text-sm text-slate-400">
+                      <span className="text-sm text-slate-400 dark:text-muted-foreground">
                         {member.aliases.join(", ")}
                       </span>
                     )}
                   </div>
-                  <Plus size={14} className="text-slate-400 dark:text-slate-500" />
+                  <Plus size={14} className="text-slate-400 dark:text-muted-foreground" />
                 </button>
               ))}
             </div>
@@ -119,7 +119,7 @@ export const TagInput = ({
             onBlur={() => setTimeout(() => setIsOpen(false), 50)}
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-slate-200"
+            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-foreground"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
           />
         </div>

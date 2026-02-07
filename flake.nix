@@ -47,9 +47,12 @@
             nodejs
             pkgs.yarn
             pkgs.openssl
+            pkgs.chromium
           ];
 
           shellHook = ''
+            export CHROMIUM_PATH=$(command -v chromium)
+
             echo "------------------------------------------------"
             echo "FSR Protocl Editor Dev Shell"
             echo "------------------------------------------------"
