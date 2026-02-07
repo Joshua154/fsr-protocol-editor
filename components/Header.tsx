@@ -69,7 +69,7 @@ export const Header = ({
           </button>
           <button
             onClick={handleSendToDiscord}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-[#5865F2] hover:bg-[#4752C4] rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
             title="An Discord senden"
           >
             <Send size={16} /> <span className="hidden sm:inline">Discord</span>
