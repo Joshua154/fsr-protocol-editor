@@ -19,23 +19,48 @@ A web-based editor for managing and generating protocols for Student Council (FS
 
 ## Preview
 
+The screenshots below are auto-generated. Re-generate them anytime with:
+
+```bash
+npm run previews:install
+npm run previews
+```
+
+On **NixOS**, Playwright's downloaded browsers may not run (stub-ld). Use dev shell bundled Chromium instead:
+
+```bash
+nix develop
+npm run previews
+```
+
 ### Full Interface
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![Full View Light](./preview/light_full.png) | ![Full View Dark](./preview/dark_full.png) |
+| ![Full View Light](./preview/readme-previews/light/full.png) | ![Full View Dark](./preview/readme-previews/dark/full.png) |
 
 ### Member Selection
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![People Select Light](./preview/light_memberSelect.png) | ![People Select Dark](./preview/dark_memberSelect.png) |
+| ![People Select Light](./preview/readme-previews/light/member_select.png) | ![People Select Dark](./preview/readme-previews/dark/member_select.png) |
 
 ### Session Management
 
 | Light Mode | Dark Mode |
 | :---: | :---: |
-| ![New Session Item Light](./preview/light_newSessionItem.png) | ![New Session Item Dark](./preview/dark_newSessionItem.png) |
+| ![New Session Item Light](./preview/readme-previews/light/new_session_item.png) | ![New Session Item Dark](./preview/readme-previews/dark/new_session_item.png) |
+
+<!-- ### Dialogs
+
+| Feature | Light Mode | Dark Mode |
+| :--- | :---: | :---: |
+| Reset confirm | ![Reset Confirm Light](./preview/readme-previews/light/dialog_reset_confirm.png) | ![Reset Confirm Dark](./preview/readme-previews/dark/dialog_reset_confirm.png) |
+| Import confirm | ![Import Confirm Light](./preview/readme-previews/light/dialog_import_confirm.png) | ![Import Confirm Dark](./preview/readme-previews/dark/dialog_import_confirm.png) |
+| Clipboard confirm | ![Clipboard Confirm Light](./preview/readme-previews/light/dialog_clipboard_confirm.png) | ![Clipboard Confirm Dark](./preview/readme-previews/dark/dialog_clipboard_confirm.png) |
+| Discord confirm | ![Discord Confirm Light](./preview/readme-previews/light/dialog_discord_confirm.png) | ![Discord Confirm Dark](./preview/readme-previews/dark/dialog_discord_confirm.png) |
+| Discord password | ![Discord Password Light](./preview/readme-previews/light/dialog_discord_password.png) | ![Discord Password Dark](./preview/readme-previews/dark/dialog_discord_password.png) |
+| Discord error | ![Discord Error Light](./preview/readme-previews/light/dialog_discord_error.png) | ![Discord Error Dark](./preview/readme-previews/dark/dialog_discord_error.png) | -->
 
 ## Features
 
