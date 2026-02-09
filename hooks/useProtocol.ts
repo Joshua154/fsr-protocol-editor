@@ -167,81 +167,72 @@ export const useProtocol = () => {
     }
   };
 
-  const handleExport = () => {
-    const dataToExport = {
-      FSR: fsrMembers,
-      Protokollant: protocolant[0] || "",
-      WeiterePersonen: guests,
-      Date: meta.Date,
-      Start: meta.Start,
-      Ende: meta.Ende,
-      Sitzung: sessionArrayToObject(sessionItems),
-    };
+  const buildExportData = () => ({
+    FSR: fsrMembers,
+    Protokollant: protocolant[0] ?? "",
+    WeiterePersonen: guests,
+    Date: meta.Date,
+    Start: meta.Start,
+    Ende: meta.Ende,
+    Sitzung: sessionArrayToObject(sessionItems),
+  });
 
-    let yamlString = yaml.dump(dataToExport, {
+  const toYamlString = (data: ReturnType<typeof buildExportData>) => {
+    let yamlString = yaml.dump(data, {
       lineWidth: -1,
       noRefs: true,
-      replacer: (_key, value) => (
-            value === null ? "" : 
-            value === "'" ? "\'" : 
-            value
-          ),
+      replacer: (_key, value) => (value === null ? "" : value),
     });
 
-    yamlString = yamlString.replace(/^(Date|Start|Ende):\s*'(.+?)'/gm, "$1: $2");
+    // unquate Date, Start, Ende fields for Discord Bot compatibility
+    yamlString = yamlString.replace(
+      /^(Date|Start|Ende):\s*'(.+?)'/gm,
+      "$1: $2"
+    );
+
+    return yamlString;
+  };
+
+  const handleExport = () => {
+    const yamlString = toYamlString(buildExportData());
 
     const blob = new Blob([yamlString], { type: "text/yaml" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Protokoll_${meta.Date || "Export"}.yaml`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Protokoll_${meta.Date || "Export"}.yaml`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   };
 
   const handleSendToDiscord = async () => {
     if (
-      !(await confirm(
-        "Möchtest du das Protokoll wirklich an Discord senden?",
-        { title: "An Discord senden" }
-      ))
+      !(await confirm("Möchtest du das Protokoll wirklich an Discord senden?", {
+        title: "An Discord senden",
+      }))
     ) {
       return;
     }
 
-    const passwordResult = await prompt("Bitte Passwort eingeben:", {
+    const password = await prompt("Bitte Passwort eingeben:", {
       title: "Passwort benötigt",
       hiddenInput: true,
     });
-    if (passwordResult === null) return; // User cancelled
+    if (password === null) return;
 
-    const password = typeof passwordResult === "string" ? passwordResult : undefined;
+    const yamlString = toYamlString(buildExportData());
+    const result = await sendToDiscord(yamlString, meta.Date || "Export", String(password));
 
-    const dataToExport = {
-      FSR: fsrMembers,
-      Protokollant: protocolant[0] || "",
-      WeiterePersonen: guests,
-      Date: meta.Date,
-      Start: meta.Start,
-      Ende: meta.Ende,
-      Sitzung: sessionArrayToObject(sessionItems),
-    };
-
-    const yamlString = yaml.dump(dataToExport, {
-      lineWidth: -1,
-      noRefs: true,
-      replacer: (_key, value) =>
-        value === null ? "" : value === "'" ? "'" : value,
+    await alert(result.success ? result.message : `Fehler: ${result.message}`, {
+      title: result.success ? "Erfolg" : "Fehler",
+      destructive: !result.success,
     });
-
-    const result = await sendToDiscord(yamlString, meta.Date || "Export", password);
-    
-    if (result.success) {
-      await alert(result.message, { title: "Erfolg" });
-    } else {
-      await alert("Fehler: " + result.message, { title: "Fehler", destructive: true });
-    }
   };
 
   const addTopic = () => {
