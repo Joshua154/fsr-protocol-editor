@@ -82,13 +82,18 @@ async function gotoWithState(
             themeValue,
             storageKey,
             protocol,
+            languageKey,
+            languageValue,
         }: {
             themeValue: ThemeName;
             storageKey: string;
             protocol: unknown | null;
+            languageKey: string;
+            languageValue: string;
         }) => {
             localStorage.clear();
             localStorage.setItem("theme", themeValue);
+            localStorage.setItem(languageKey, languageValue);
             if (protocol) {
                 localStorage.setItem(storageKey, JSON.stringify(protocol));
             }
@@ -97,6 +102,8 @@ async function gotoWithState(
             themeValue: theme,
             storageKey: "fsr-protocol-data",
             protocol: protocolData ?? null,
+            languageKey: "fsr-protocol-lang",
+            languageValue: "de",
         },
     );
 
@@ -107,13 +114,6 @@ async function gotoWithState(
 async function screenshot(page: Page, outPath: string) {
     await ensureDir(path.dirname(outPath));
     await page.screenshot({ path: outPath, fullPage: true });
-}
-
-async function waitForDialog(page: Page) {
-    await page
-        .locator('[role="dialog"]')
-        .first()
-        .waitFor({ state: "visible", timeout: 5000 });
 }
 
 async function openMemberSuggestions(page: Page) {
