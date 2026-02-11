@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { DialogProvider } from "@/components/DialogProvider";
+import { I18nProvider } from "@/components/I18nProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <DialogProvider>{children}</DialogProvider>
+          <I18nProvider>
+            <DialogProvider>{children}</DialogProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>
