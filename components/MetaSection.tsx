@@ -2,6 +2,7 @@ import React from "react";
 import { Users, Calendar } from "lucide-react";
 import { TagInput } from "./TagInput";
 import { Member } from "@/common/types";
+import { useI18n } from "@/components/I18nProvider";
 
 interface MetaSectionProps {
   fsrMembers: string[];
@@ -22,7 +23,7 @@ const getCurrentTimeString = (): string => {
   const minutes = now.getMinutes().toString().padStart(2, "0");
   const seconds = now.getSeconds().toString().padStart(2, "0");
   return `${hours}:${minutes}:${seconds}`;
-}
+};
 
 export const MetaSection = ({
   fsrMembers,
@@ -36,20 +37,22 @@ export const MetaSection = ({
   meta,
   setMeta,
 }: MetaSectionProps) => {
+  const { t } = useI18n();
+
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div className="bg-white dark:bg-card p-6 rounded-xl shadow-md border border-slate-200 dark:border-border col-span-2 space-y-5 dark:shadow-none">
         <h2 className="text-md font-semibold text-slate-400 dark:text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-          <Users size={16} /> Anwesenheit
+          <Users size={16} /> {t("meta.attendance")}
         </h2>
         <TagInput
-          label="FSR Mitglieder (Gewählt)"
+          label={t("meta.fsrMembers")}
           selected={fsrMembers}
           setSelected={setFsrMembers}
           suggestions={availableFsrMembers}
         />
         <TagInput
-          label="Weitere Personen (Assoziierte / Gäste)"
+          label={t("meta.otherPeople")}
           selected={guests}
           setSelected={setGuests}
           suggestions={availableAssocMembers}
@@ -57,11 +60,11 @@ export const MetaSection = ({
       </div>
       <div className="bg-white dark:bg-card p-6 rounded-xl shadow-md border border-slate-200 dark:border-border space-y-4 dark:shadow-none">
         <h2 className="text-md font-semibold text-slate-400 dark:text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Calendar size={16} /> Details
+          <Calendar size={16} /> {t("meta.details")}
         </h2>
         <div>
           <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
-            Datum
+            {t("meta.date")}
           </label>
           <input
             type="date"
@@ -73,7 +76,7 @@ export const MetaSection = ({
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
-              Start{" "}
+              {t("meta.start")}{" "}
               <button
                 type="button"
                 className="text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
@@ -84,20 +87,20 @@ export const MetaSection = ({
                   })
                 }
               >
-                jetzt
+                {t("meta.now")}
               </button>
             </label>
             <input
               type="time"
               step="1"
               value={meta.Start}
-              onChange={(e) => {console.log(e.target.value); setMeta({ ...meta, Start: e.target.value })}}
+              onChange={(e) => setMeta({ ...meta, Start: e.target.value })}
               className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
-              Ende{" "}
+              {t("meta.end")}{" "}
               <button
                 type="button"
                 className="text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
@@ -108,7 +111,7 @@ export const MetaSection = ({
                   })
                 }
               >
-                jetzt
+                {t("meta.now")}
               </button>
             </label>
             <input
@@ -122,7 +125,7 @@ export const MetaSection = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
-            Protokollant:in
+            {t("meta.protocolant")}
           </label>
           <TagInput
             label=""

@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { SessionItem } from "@/common/types";
+import { useI18n } from "@/components/I18nProvider";
 
 interface SortableSessionItemProps {
   item: SessionItem;
@@ -21,6 +24,7 @@ export const SortableSessionItem = ({
   updatePoint,
   removePoint,
 }: SortableSessionItemProps) => {
+  const { t } = useI18n();
   const {
     attributes,
     listeners,
@@ -52,7 +56,7 @@ export const SortableSessionItem = ({
           {...attributes}
           {...listeners}
           className="cursor-grab active:cursor-grabbing text-slate-400 dark:text-muted-foreground hover:text-indigo-600 dark:hover:text-primary p-1"
-          title="Ziehen zum Sortieren"
+          title={t("session.dragToSort")}
         >
           <GripVertical size={20} />
         </div>
@@ -62,13 +66,13 @@ export const SortableSessionItem = ({
           value={item.topic}
           onChange={(e) => updateTopicTitle(item.id, e.target.value)}
           className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-foreground placeholder-slate-400 dark:placeholder-muted-foreground outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
-          placeholder="Thema Titel..."
+          placeholder={t("session.topicPlaceholder")}
           onKeyDown={(e) => e.stopPropagation()} // Stop DND from interfering with typing
         />
         <button
           onClick={() => removeTopic(item.id)}
           className="text-slate-400 dark:text-muted-foreground hover:text-red-500 dark:hover:text-red-400 transition-colors p-2"
-          title="Thema löschen"
+          title={t("session.deleteTopicTitle")}
         >
           <Trash2 size={18} />
         </button>
@@ -88,7 +92,7 @@ export const SortableSessionItem = ({
                   ? 1
                   : Math.max(1, Math.ceil(point.length / 80))
               }
-              placeholder="Inhalt des Tagesordnungspunkts..."
+              placeholder={t("session.pointPlaceholder")}
               onKeyDown={(e) => e.stopPropagation()} 
             />
             <button
@@ -103,7 +107,7 @@ export const SortableSessionItem = ({
           onClick={() => addPoint(item.id)}
           className="ml-5 text-md text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
         >
-          <Plus size={14} /> Punkt hinzufügen
+          <Plus size={14} /> {t("session.addPoint")}
         </button>
       </div>
     </div>

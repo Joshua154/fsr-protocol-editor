@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Modal } from "@/components/Modal";
+import { useI18n } from "@/components/I18nProvider";
 
 type DialogType = "alert" | "confirm" | "prompt";
 
@@ -50,6 +51,7 @@ interface DialogState {
 }
 
 export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useI18n();
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [inputValue, setInputValue] = useState("");
 
@@ -76,36 +78,36 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
   const confirm = useCallback(
     (message: string, options?: DialogOptions) => {
       return showDialog("confirm", message, {
-        title: "Bestätigen",
-        confirmText: "Ja",
-        cancelText: "Abbrechen",
+        title: t("dialog.confirm.title"),
+        confirmText: t("dialog.confirm.yes"),
+        cancelText: t("dialog.confirm.cancel"),
         ...options,
       });
     },
-    [showDialog]
+    [showDialog, t]
   );
 
   const alert = useCallback(
     (message: string, options?: DialogOptions) => {
       return showDialog("alert", message, {
-        title: "Hinweis",
-        confirmText: "OK",
+        title: t("dialog.alert.title"),
+        confirmText: t("dialog.ok"),
         ...options,
       });
     },
-    [showDialog]
+    [showDialog, t]
   );
 
   const prompt = useCallback(
-    (message: string, options?: DialogOptions) => {
+    (message: string, options?: DialogOptionsPrompt) => {
       return showDialog("prompt", message, {
-        title: "Eingabe",
-        confirmText: "OK",
-        cancelText: "Abbrechen",
+        title: t("dialog.prompt.title"),
+        confirmText: t("dialog.ok"),
+        cancelText: t("dialog.confirm.cancel"),
         ...options,
       });
     },
-    [showDialog]
+    [showDialog, t]
   );
 
   const handleClose = () => {

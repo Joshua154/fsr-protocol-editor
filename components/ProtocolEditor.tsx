@@ -21,6 +21,7 @@ import { Header } from "@/components/Header";
 import { MetaSection } from "@/components/MetaSection";
 import { SortableSessionItem } from "@/components/SortableSessionItem";
 import { Member } from "@/common/types";
+import { useI18n } from "@/components/I18nProvider";
 
 interface ProtocolEditorProps {
   availableFsrMembers: Member[];
@@ -31,6 +32,7 @@ export function ProtocolEditor({
   availableFsrMembers,
   availableAssocMembers,
 }: ProtocolEditorProps) {
+  const { t } = useI18n();
   const {
     fsrMembers,
     setFsrMembers,
@@ -94,17 +96,16 @@ export function ProtocolEditor({
           availableAssocMembers={availableAssocMembers}
         />
 
-        {/* Meeting Content */}
         <section>
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-slate-800 dark:text-foreground">
-              Sitzungsinhalte
+              {t("session.content")}
             </h2>
             <button
               onClick={addTopic}
               className="flex items-center gap-1 text-sm text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
             >
-              <Plus size={16} /> Neues Thema
+              <Plus size={16} /> {t("session.newTopic")}
             </button>
           </div>
 
@@ -133,10 +134,7 @@ export function ProtocolEditor({
 
               {sessionItems.length === 0 && (
                 <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-border text-slate-400 dark:text-muted-foreground">
-                  <p>
-                    Keine Themen vorhanden. Füge ein Thema hinzu oder importiere
-                    ein Protokoll.
-                  </p>
+                  <p>{t("session.empty")}</p>
                 </div>
               )}
             </div>

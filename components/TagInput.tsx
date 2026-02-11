@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useState, useRef, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
 import { Member } from "@/common/types";
+import { useI18n } from "@/components/I18nProvider";
 
 interface TagInputProps {
   label: string;
@@ -17,6 +20,7 @@ export const TagInput = ({
   suggestions,
   maxSelections = -1,
 }: TagInputProps) => {
+  const { t } = useI18n();
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -120,7 +124,7 @@ export const TagInput = ({
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
             className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-foreground"
-            placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
+            placeholder={selected.length === 0 ? t("tagInput.placeholder") : ""}
           />
         </div>
       </div>
