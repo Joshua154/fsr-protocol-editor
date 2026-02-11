@@ -46,6 +46,8 @@ export const Header = ({
           >
             <option value="de">DE</option>
             <option value="en">EN</option>
+            <option value="es">ES</option>
+            <option value="ru">RU</option>
           </select>
           <button
             onClick={resetProtocol}

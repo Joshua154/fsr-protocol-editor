@@ -1,4 +1,4 @@
-export const SUPPORTED_LANGUAGES = ["de", "en"] as const;
+export const SUPPORTED_LANGUAGES = ["de", "en", "es", "ru"] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 
 export type TranslationKey =
@@ -82,7 +82,8 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
 
     "session.content": "Sitzungsinhalte",
     "session.newTopic": "Neues Thema",
-    "session.empty": "Keine Themen vorhanden. Füge ein Thema hinzu oder importiere ein Protokoll.",
+    "session.empty":
+      "Keine Themen vorhanden. Füge ein Thema hinzu oder importiere ein Protokoll.",
 
     "session.dragToSort": "Ziehen zum Sortieren",
     "session.topicPlaceholder": "Thema Titel...",
@@ -99,13 +100,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "dialog.prompt.title": "Eingabe",
     "dialog.ok": "OK",
 
-    "protocol.reset.message": "Möchtest du das Protokoll wirklich zurücksetzen? Alle ungespeicherten Daten gehen verloren.",
+    "protocol.reset.message":
+      "Möchtest du das Protokoll wirklich zurücksetzen? Alle ungespeicherten Daten gehen verloren.",
     "protocol.reset.title": "Protokoll zurücksetzen",
 
-    "import.confirm.message": "Das Importieren eines Protokolls überschreibt alle aktuellen Daten. Fortfahren?",
+    "import.confirm.message":
+      "Das Importieren eines Protokolls überschreibt alle aktuellen Daten. Fortfahren?",
     "import.confirm.title": "Importieren",
 
-    "paste.confirm.message": "Das Einfügen aus der Zwischenablage überschreibt alle aktuellen Daten. Fortfahren?",
+    "paste.confirm.message":
+      "Das Einfügen aus der Zwischenablage überschreibt alle aktuellen Daten. Fortfahren?",
     "paste.confirm.title": "Einfügen",
 
     "clipboard.empty": "Zwischenablage ist leer!",
@@ -117,7 +121,8 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "error.title": "Fehler",
     "yaml.readError": "Fehler beim Lesen des YAMLs. Bitte Format prüfen.",
 
-    "discord.confirm.message": "Möchtest du das Protokoll wirklich an Discord senden?",
+    "discord.confirm.message":
+      "Möchtest du das Protokoll wirklich an Discord senden?",
     "discord.confirm.title": "An Discord senden",
     "discord.password.message": "Bitte Passwort eingeben:",
     "discord.password.title": "Passwort benötigt",
@@ -171,13 +176,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "dialog.prompt.title": "Input",
     "dialog.ok": "OK",
 
-    "protocol.reset.message": "Do you really want to reset the protocol? All unsaved data will be lost.",
+    "protocol.reset.message":
+      "Do you really want to reset the protocol? All unsaved data will be lost.",
     "protocol.reset.title": "Reset protocol",
 
-    "import.confirm.message": "Importing a protocol will overwrite all current data. Continue?",
+    "import.confirm.message":
+      "Importing a protocol will overwrite all current data. Continue?",
     "import.confirm.title": "Import",
 
-    "paste.confirm.message": "Pasting from clipboard will overwrite all current data. Continue?",
+    "paste.confirm.message":
+      "Pasting from clipboard will overwrite all current data. Continue?",
     "paste.confirm.title": "Paste",
 
     "clipboard.empty": "Clipboard is empty!",
@@ -189,7 +197,8 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "error.title": "Error",
     "yaml.readError": "Failed to read YAML. Please check the format.",
 
-    "discord.confirm.message": "Do you really want to send the protocol to Discord?",
+    "discord.confirm.message":
+      "Do you really want to send the protocol to Discord?",
     "discord.confirm.title": "Send to Discord",
     "discord.password.message": "Please enter password:",
     "discord.password.title": "Password required",
@@ -203,12 +212,166 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
 
     "success.title": "Success",
   },
+  ru: {
+    "app.title": "FSR Редактор протоколов",
+
+    "header.reset": "Сбросить",
+    "header.resetTitle": "Сбросить протокол",
+    "header.clipboard": "Буфер обмена",
+    "header.import": "Импорт",
+    "header.export": "Экспорт",
+    "header.discord": "Discord",
+    "header.discordTitle": "Отправить в Discord",
+
+    "meta.attendance": "Посещаемость",
+    "meta.fsrMembers": "Члены FSR (избранные)",
+    "meta.otherPeople": "Другие (ассоциированные / гости)",
+    "meta.details": "Детали",
+    "meta.date": "Дата",
+    "meta.start": "Начало",
+    "meta.end": "Конец",
+    "meta.now": "сейчас",
+    "meta.protocolant": "Протоколист",
+
+    "session.content": "Содержание заседания",
+    "session.newTopic": "Новая тема",
+    "session.empty": "Тем нет. Добавьте тему или импортируйте протокол.",
+
+    "session.dragToSort": "Перетащите для сортировки",
+    "session.topicPlaceholder": "Заголовок темы...",
+    "session.deleteTopicTitle": "Удалить тему",
+    "session.pointPlaceholder": "Содержание пункта повестки...",
+    "session.addPoint": "Добавить пункт",
+
+    "tagInput.placeholder": "Выберите имена...",
+
+    "dialog.confirm.title": "Подтверждение",
+    "dialog.confirm.yes": "Да",
+    "dialog.confirm.cancel": "Отмена",
+    "dialog.alert.title": "Уведомление",
+    "dialog.prompt.title": "Ввод данных",
+    "dialog.ok": "OK",
+
+    "protocol.reset.message":
+      "Вы действительно хотите сбросить протокол? Все несохраненные данные будут утеряны.",
+    "protocol.reset.title": "Сбросить протокол",
+
+    "import.confirm.message":
+      "Импорт протокола перезапишет все текущие данные. Продолжить?",
+    "import.confirm.title": "Импорт",
+
+    "paste.confirm.message":
+      "Вставка из буфера обмена перезапишет все текущие данные. Продолжить?",
+    "paste.confirm.title": "Вставить",
+
+    "clipboard.empty": "Буфер обмена пуст!",
+    "clipboard.denied": "Доступ к буферу обмена запрещен!",
+
+    "export.filenamePrefix": "Протокол",
+    "export.filenameFallback": "Экспорт",
+
+    "error.title": "Ошибка",
+    "yaml.readError": "Ошибка чтения YAML. Пожалуйста, проверьте формат.",
+
+    "discord.confirm.message":
+      "Вы действительно хотите отправить протокол в Discord?",
+    "discord.confirm.title": "Отправить в Discord",
+    "discord.password.message": "Введите пароль:",
+    "discord.password.title": "Требуется пароль",
+
+    "discord.webhookMissing": "URL вебхука Discord не настроен.",
+    "discord.passwordRequired": "Пожалуйста, введите пароль.",
+    "discord.passwordWrong": "Неверный пароль.",
+    "discord.sendFailed": "Ошибка при отправке",
+    "discord.networkError": "Сетевая ошибка при отправке в Discord.",
+    "discord.sent": "Протокол успешно отправлен в Discord!",
+
+    "success.title": "Успех",
+  },
+  es: {
+    "app.title": "Editor de Actas FSR",
+
+    "header.reset": "Restablecer",
+    "header.resetTitle": "Restablecer acta",
+    "header.clipboard": "Portapapeles",
+    "header.import": "Importar",
+    "header.export": "Exportar",
+    "header.discord": "Discord",
+    "header.discordTitle": "Enviar a Discord",
+
+    "meta.attendance": "Asistencia",
+    "meta.fsrMembers": "Miembros del FSR (Electos)",
+    "meta.otherPeople": "Otras personas (Asociados / Invitados)",
+    "meta.details": "Detalles",
+    "meta.date": "Fecha",
+    "meta.start": "Inicio",
+    "meta.end": "Fin",
+    "meta.now": "ahora",
+    "meta.protocolant": "Secretario/a",
+
+    "session.content": "Contenido de la sesión",
+    "session.newTopic": "Nuevo tema",
+    "session.empty":
+      "No hay temas disponibles. Añade un tema o importa un acta.",
+
+    "session.dragToSort": "Arrastrar para ordenar",
+    "session.topicPlaceholder": "Título del tema...",
+    "session.deleteTopicTitle": "Eliminar tema",
+    "session.pointPlaceholder": "Contenido del punto del día...",
+    "session.addPoint": "Añadir punto",
+
+    "tagInput.placeholder": "Seleccionar nombres...",
+
+    "dialog.confirm.title": "Confirmar",
+    "dialog.confirm.yes": "Sí",
+    "dialog.confirm.cancel": "Cancelar",
+    "dialog.alert.title": "Aviso",
+    "dialog.prompt.title": "Entrada",
+    "dialog.ok": "OK",
+
+    "protocol.reset.message":
+      "¿Realmente deseas restablecer el acta? Se perderán todos los datos no guardados.",
+    "protocol.reset.title": "Restablecer acta",
+
+    "import.confirm.message":
+      "Importar un acta sobrescribirá todos los datos actuales. ¿Continuar?",
+    "import.confirm.title": "Importar",
+
+    "paste.confirm.message":
+      "Pegar desde el portapapeles sobrescribirá todos los datos actuales. ¿Continuar?",
+    "paste.confirm.title": "Pegar",
+
+    "clipboard.empty": "¡El portapapeles está vacío!",
+    "clipboard.denied": "¡Acceso al portapapeles denegado!",
+
+    "export.filenamePrefix": "Acta",
+    "export.filenameFallback": "Exportar",
+
+    "error.title": "Error",
+    "yaml.readError": "Error al leer el YAML. Por favor, comprueba el formato.",
+
+    "discord.confirm.message": "¿Realmente deseas enviar el acta a Discord?",
+    "discord.confirm.title": "Enviar a Discord",
+    "discord.password.message": "Por favor, introduce la contraseña:",
+    "discord.password.title": "Contraseña requerida",
+
+    "discord.webhookMissing": "URL del webhook de Discord no configurada.",
+    "discord.passwordRequired": "Por favor, introduce la contraseña.",
+    "discord.passwordWrong": "Contraseña incorrecta.",
+    "discord.sendFailed": "Error al enviar",
+    "discord.networkError": "Error de red al enviar a Discord.",
+    "discord.sent": "¡Acta enviada con éxito a Discord!",
+
+    "success.title": "Éxito",
+  },
 };
 
 export function normalizeLanguage(input: string | null | undefined): Language {
   const raw = (input ?? "").trim().toLowerCase();
   if (raw.startsWith("de")) return "de";
   if (raw.startsWith("en")) return "en";
+  if (raw.startsWith("es")) return "es";
+  if (raw.startsWith("ru")) return "ru";
   return "de";
 }
 
