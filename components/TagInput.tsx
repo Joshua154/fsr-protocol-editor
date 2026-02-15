@@ -1,6 +1,8 @@
-import React, { useState, useRef, KeyboardEvent } from "react";
+import React, { useRef, useState, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
 import { Member } from "@/common/types";
+import { MemberSuggestionDropdown } from "@/components/MemberSuggestionDropdown";
+import { useMemberSuggestions } from "@/hooks/useMemberSuggestions";
 
 interface TagInputProps {
   label: string;
@@ -21,13 +23,10 @@ export const TagInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const availableOptions = suggestions.filter((member) => {
-    if (selected.includes(member.name)) return false;
-    const lowerInput = input.toLowerCase();
-    return (
-      member.name.toLowerCase().includes(lowerInput) ||
-      member.aliases?.some((alias) => alias.toLowerCase().includes(lowerInput))
-    );
+  const { matches: availableOptions } = useMemberSuggestions(suggestions, input, {
+    enabled: isOpen,
+    excludeNames: selected,
+    limit: 50,
   });
 
   const addTag = (tag: string) => {
@@ -83,28 +82,18 @@ export const TagInput = ({
         {isOpen &&
           availableOptions.length > 0 &&
           (maxSelections === -1 || selected.length < maxSelections) && (
-            <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
-              {availableOptions.map((member) => (
-                <button
-                  key={member.name}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    addTag(member.name);
-                  }}
-                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center"
-                >
-                  <div className="flex flex-col">
-                    <span>{member.name}</span>
-                    {member.aliases && member.aliases.length > 0 && (
-                      <span className="text-sm text-slate-400 dark:text-muted-foreground">
-                        {member.aliases.join(", ")}
-                      </span>
-                    )}
-                  </div>
-                  <Plus size={14} className="text-slate-400 dark:text-muted-foreground" />
-                </button>
-              ))}
-            </div>
+            <MemberSuggestionDropdown
+              isOpen
+              members={availableOptions}
+              onPick={(member) => addTag(member.name)}
+              className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto"
+              renderRight={() => (
+                <Plus
+                  size={14}
+                  className="text-slate-400 dark:text-muted-foreground"
+                />
+              )}
+            />
           )}
         <div className="relative flex-1 min-w-30">
           <input

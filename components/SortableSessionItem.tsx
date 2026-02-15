@@ -1,8 +1,10 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GripVertical, Trash2, Plus } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
+import { MemberSuggestionDropdown } from "@/components/MemberSuggestionDropdown";
+import { useMemberSuggestions } from "@/hooks/useMemberSuggestions";
 
 interface SortableSessionItemProps {
   item: SessionItem;
@@ -71,31 +73,14 @@ export const SortableSessionItem = ({
     cursorIndex: null,
   });
 
-  const normalizedSuggestions = useMemo(() => {
-    const seen = new Set<string>();
-    const out: Member[] = [];
-    for (const m of memberSuggestions) {
-      const name = (m?.name ?? "").trim();
-      if (!name) continue;
-      const key = name.toLowerCase();
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push({ name, aliases: m.aliases ?? [] });
+  const { matches: mentionMatches } = useMemberSuggestions(
+    memberSuggestions,
+    mention.query,
+    {
+      enabled: mention.isOpen,
+      limit: 10,
     }
-    return out;
-  }, [memberSuggestions]);
-
-  const mentionMatches = useMemo(() => {
-    if (!mention.isOpen) return [] as Member[];
-    const q = mention.query.trim().toLowerCase();
-    if (!q) return normalizedSuggestions.slice(0, 10);
-    return normalizedSuggestions
-      .filter((m) => {
-        if (m.name.toLowerCase().includes(q)) return true;
-        return (m.aliases ?? []).some((a) => a.toLowerCase().includes(q));
-      })
-      .slice(0, 10);
-  }, [mention.isOpen, mention.query, normalizedSuggestions]);
+  );
 
   const getTargetEl = (target: MentionTarget | null) => {
     if (!target) return null;
@@ -103,7 +88,7 @@ export const SortableSessionItem = ({
     return pointRefs.current[target.idx] ?? null;
   };
 
-  const closeMention = () => {
+  const closeMention = useCallback(() => {
     setMention((m) => ({
       ...m,
       isOpen: false,
@@ -114,7 +99,7 @@ export const SortableSessionItem = ({
       triggerIndex: null,
       cursorIndex: null,
     }));
-  };
+  }, []);
 
   const findMentionContext = (text: string, cursorIndex: number) => {
     const uptoCursor = text.slice(0, cursorIndex);
@@ -154,7 +139,7 @@ export const SortableSessionItem = ({
     }));
   };
 
-  const applyMention = (memberName: string) => {
+  const applyMention = useCallback((memberName: string) => {
     if (!mention.isOpen || !mention.target) return;
     const target = mention.target;
     const text =
@@ -167,7 +152,7 @@ export const SortableSessionItem = ({
 
     const before = text.slice(0, triggerIndex);
     const after = text.slice(cursorIndex);
-    const insert = `@${memberName}`;
+    const insert = `${memberName}`;
     const needsSpace = after.length > 0 && !/^\s/.test(after);
     const nextText = `${before}${insert}${needsSpace ? " " : ""}${after}`;
     const nextCursor = (before + insert + (needsSpace ? " " : "")).length;
@@ -180,46 +165,68 @@ export const SortableSessionItem = ({
 
     pendingSelectionRef.current = { target, pos: nextCursor };
     closeMention();
-  };
+  }, [
+    closeMention,
+    item.id,
+    item.points,
+    item.topic,
+    mention.cursorIndex,
+    mention.isOpen,
+    mention.target,
+    mention.triggerIndex,
+    updatePoint,
+    updateTopicTitle,
+  ]);
 
-  const handleMentionKeyDown = (e: React.KeyboardEvent) => {
-    if (!mention.isOpen) return false;
+  const handleMentionKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!mention.isOpen) return false;
 
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setMention((m) => ({
-        ...m,
-        activeIndex:
-          mentionMatches.length === 0
-            ? 0
-            : (m.activeIndex + 1) % mentionMatches.length,
-      }));
-      return true;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setMention((m) => ({
-        ...m,
-        activeIndex:
-          mentionMatches.length === 0
-            ? 0
-            : (m.activeIndex - 1 + mentionMatches.length) % mentionMatches.length,
-      }));
-      return true;
-    }
-    if (e.key === "Enter" || e.key === "Tab") {
-      if (mentionMatches.length === 0) return false;
-      e.preventDefault();
-      applyMention(mentionMatches[Math.max(0, mention.activeIndex)]!.name);
-      return true;
-    }
-    if (e.key === "Escape") {
-      e.preventDefault();
-      closeMention();
-      return true;
-    }
-    return false;
-  };
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setMention((m) => ({
+          ...m,
+          activeIndex:
+            mentionMatches.length === 0
+              ? 0
+              : (m.activeIndex + 1) % mentionMatches.length,
+        }));
+        return true;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setMention((m) => ({
+          ...m,
+          activeIndex:
+            mentionMatches.length === 0
+              ? 0
+              : (m.activeIndex - 1 + mentionMatches.length) % mentionMatches.length,
+        }));
+        return true;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        if (mentionMatches.length === 0) return false;
+        e.preventDefault();
+        applyMention(mentionMatches[Math.max(0, mention.activeIndex)]!.name);
+        return true;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMention();
+        return true;
+      }
+      return false;
+    },
+    [mention.isOpen, mention.activeIndex, mentionMatches, applyMention, closeMention]
+  );
+
+  const onEditorKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (handleMentionKeyDown(e)) return;
+      e.stopPropagation();
+    },
+    [handleMentionKeyDown]
+  );
 
   useLayoutEffect(() => {
     const pending = pendingSelectionRef.current;
@@ -245,7 +252,7 @@ export const SortableSessionItem = ({
     };
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
-  }, [mention.isOpen, mention.target]);
+  }, [mention.isOpen, mention.target, closeMention]);
 
   return (
     <div
@@ -255,43 +262,27 @@ export const SortableSessionItem = ({
         isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-border dark:shadow-none"
       }`}
     >
-      {mention.isOpen && mention.anchor && mentionMatches.length > 0 && (
-        <div
-          ref={dropdownRef}
-          style={{
-            position: "fixed",
-            top: mention.anchor.top,
-            left: mention.anchor.left,
-            width: mention.anchor.width,
-          }}
-          className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
-        >
-          {mentionMatches.map((m, idx) => (
-            <button
-              key={m.name}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                applyMention(m.name);
-              }}
-              className={`w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center ${
-                idx === mention.activeIndex
-                  ? "bg-indigo-50 dark:bg-zinc-800"
-                  : ""
-              }`}
-            >
-              <div className="flex flex-col">
-                <span>{m.name}</span>
-                {m.aliases && m.aliases.length > 0 && (
-                  <span className="text-sm text-slate-400 dark:text-muted-foreground">
-                    {m.aliases.join(", ")}
-                  </span>
-                )}
-              </div>
-              <span className="text-slate-400 dark:text-muted-foreground">@</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <MemberSuggestionDropdown
+        isOpen={mention.isOpen && !!mention.anchor}
+        members={mentionMatches}
+        activeIndex={mention.activeIndex}
+        onPick={(m) => applyMention(m.name)}
+        renderRight={() => (
+          <span className="text-slate-400 dark:text-muted-foreground">@</span>
+        )}
+        containerRef={dropdownRef}
+        position="fixed"
+        style={
+          mention.anchor
+            ? {
+                top: mention.anchor.top,
+                left: mention.anchor.left,
+                width: mention.anchor.width,
+              }
+            : undefined
+        }
+        className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
+      />
 
       {/* Topic Header */}
       <div className="bg-slate-50 dark:bg-zinc-900 p-4 border-b border-slate-100 dark:border-border flex gap-4 items-center">
@@ -315,10 +306,7 @@ export const SortableSessionItem = ({
           }}
           className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-foreground placeholder-slate-400 dark:placeholder-muted-foreground outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
           placeholder="Thema Titel..."
-          onKeyDown={(e) => {
-            if (handleMentionKeyDown(e)) return;
-            e.stopPropagation();
-          }} // Stop DND from interfering with typing
+          onKeyDown={onEditorKeyDown} // Stop DND from interfering with typing
           onBlur={() => setTimeout(() => closeMention(), 80)}
         />
         <button
@@ -355,10 +343,7 @@ export const SortableSessionItem = ({
                   : Math.max(1, Math.ceil(point.length / 80))
               }
               placeholder="Inhalt des Tagesordnungspunkts..."
-              onKeyDown={(e) => {
-                if (handleMentionKeyDown(e)) return;
-                e.stopPropagation();
-              }}
+              onKeyDown={onEditorKeyDown}
               onBlur={() => setTimeout(() => closeMention(), 80)}
             />
             <button
