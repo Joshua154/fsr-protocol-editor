@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Member } from "@/common/types";
 
 type Props = {
@@ -14,11 +14,23 @@ export function MemberSuggestionList({
   onPick,
   renderRight,
 }: Props) {
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    if (activeIndex < 0) return;
+    const el = itemRefs.current[activeIndex];
+    if (!el) return;
+    el.scrollIntoView({ block: "nearest" });
+  }, [activeIndex, members.length]);
+
   return (
     <>
       {members.map((member, idx) => (
         <button
           key={member.name}
+          ref={(el) => {
+            itemRefs.current[idx] = el;
+          }}
           onMouseDown={(e) => {
             e.preventDefault();
             onPick(member);
