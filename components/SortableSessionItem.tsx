@@ -3,8 +3,8 @@ import { GripVertical, Trash2, Plus } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
-import { MemberSuggestionDropdown } from "@/components/MemberSuggestionDropdown";
-import { useMemberSuggestions } from "@/hooks/useMemberSuggestions";
+import { MemberSuggestions } from "@/components/MemberSuggestions";
+import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
 
 interface SortableSessionItemProps {
   item: SessionItem;
@@ -24,7 +24,6 @@ type MentionState = {
   isOpen: boolean;
   target: MentionTarget | null;
   query: string;
-  activeIndex: number;
   anchor: { top: number; left: number; width: number } | null;
   triggerIndex: number | null;
   cursorIndex: number | null;
@@ -67,20 +66,12 @@ export const SortableSessionItem = ({
     isOpen: false,
     target: null,
     query: "",
-    activeIndex: 0,
     anchor: null,
     triggerIndex: null,
     cursorIndex: null,
   });
 
-  const { matches: mentionMatches } = useMemberSuggestions(
-    memberSuggestions,
-    mention.query,
-    {
-      enabled: mention.isOpen,
-      limit: 10,
-    }
-  );
+  const [mentionMatches, setMentionMatches] = useState<Member[]>([]);
 
   const getTargetEl = (target: MentionTarget | null) => {
     if (!target) return null;
@@ -94,7 +85,6 @@ export const SortableSessionItem = ({
       isOpen: false,
       target: null,
       query: "",
-      activeIndex: 0,
       anchor: null,
       triggerIndex: null,
       cursorIndex: null,
@@ -128,7 +118,6 @@ export const SortableSessionItem = ({
       isOpen: true,
       target,
       query: ctx.query,
-      activeIndex: 0,
       anchor: {
         top: rect.bottom + 6,
         left: rect.left,
@@ -178,54 +167,23 @@ export const SortableSessionItem = ({
     updateTopicTitle,
   ]);
 
-  const handleMentionKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!mention.isOpen) return false;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setMention((m) => ({
-          ...m,
-          activeIndex:
-            mentionMatches.length === 0
-              ? 0
-              : (m.activeIndex + 1) % mentionMatches.length,
-        }));
-        return true;
-      }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setMention((m) => ({
-          ...m,
-          activeIndex:
-            mentionMatches.length === 0
-              ? 0
-              : (m.activeIndex - 1 + mentionMatches.length) % mentionMatches.length,
-        }));
-        return true;
-      }
-      if (e.key === "Enter" || e.key === "Tab") {
-        if (mentionMatches.length === 0) return false;
-        e.preventDefault();
-        applyMention(mentionMatches[Math.max(0, mention.activeIndex)]!.name);
-        return true;
-      }
-      if (e.key === "Escape") {
-        e.preventDefault();
-        closeMention();
-        return true;
-      }
-      return false;
-    },
-    [mention.isOpen, mention.activeIndex, mentionMatches, applyMention, closeMention]
-  );
+  const {
+    activeIndex: mentionActiveIndex,
+    onKeyDown: onMentionKeyDown,
+    setActiveIndex: setMentionActiveIndex,
+  } = useSuggestionNavigation({
+    isOpen: mention.isOpen,
+    matches: mentionMatches,
+    onPick: (member) => applyMention(member.name),
+    onClose: closeMention,
+  });
 
   const onEditorKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (handleMentionKeyDown(e)) return;
+      if (onMentionKeyDown(e)) return;
       e.stopPropagation();
     },
-    [handleMentionKeyDown]
+    [onMentionKeyDown]
   );
 
   useLayoutEffect(() => {
@@ -262,11 +220,17 @@ export const SortableSessionItem = ({
         isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-border dark:shadow-none"
       }`}
     >
-      <MemberSuggestionDropdown
+      <MemberSuggestions
         isOpen={mention.isOpen && !!mention.anchor}
-        members={mentionMatches}
-        activeIndex={mention.activeIndex}
+        members={memberSuggestions}
+        query={mention.query}
+        limit={10}
+        activeIndex={mentionActiveIndex}
         onPick={(m) => applyMention(m.name)}
+        onMatchesChange={(next) => {
+          setMentionMatches(next);
+          setMentionActiveIndex(0);
+        }}
         renderRight={() => (
           <span className="text-slate-400 dark:text-muted-foreground">@</span>
         )}
