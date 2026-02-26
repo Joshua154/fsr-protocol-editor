@@ -31,6 +31,10 @@ export function ProtocolEditor({
   availableFsrMembers,
   availableAssocMembers,
 }: ProtocolEditorProps) {
+  const memberSuggestions = React.useMemo(
+    () => [...availableFsrMembers, ...availableAssocMembers],
+    [availableFsrMembers, availableAssocMembers]
+  );
   const {
     fsrMembers,
     setFsrMembers,
@@ -122,6 +126,7 @@ export function ProtocolEditor({
                   <SortableSessionItem
                     key={item.id}
                     item={item}
+                    memberSuggestions={memberSuggestions}
                     updateTopicTitle={updateTopicTitle}
                     removeTopic={removeTopic}
                     addPoint={addPoint}
