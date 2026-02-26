@@ -1,6 +1,8 @@
-import React, { useState, useRef, KeyboardEvent } from "react";
+import React, { useRef, useState, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
 import { Member } from "@/common/types";
+import { MemberSuggestions } from "@/components/MemberSuggestions";
+import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
 
 interface TagInputProps {
   label: string;
@@ -19,16 +21,19 @@ export const TagInput = ({
 }: TagInputProps) => {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [matches, setMatches] = useState<Member[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const availableOptions = suggestions.filter((member) => {
-    if (selected.includes(member.name)) return false;
-    const lowerInput = input.toLowerCase();
-    return (
-      member.name.toLowerCase().includes(lowerInput) ||
-      member.aliases?.some((alias) => alias.toLowerCase().includes(lowerInput))
-    );
-  });
+  const canOpenSuggestions =
+    isOpen && (maxSelections === -1 || selected.length < maxSelections);
+
+  const { activeIndex, onKeyDown: onSuggestionKeyDown, setActiveIndex } =
+    useSuggestionNavigation({
+      isOpen: canOpenSuggestions,
+      matches,
+      onPick: (member) => addTag(member.name),
+      onClose: () => setIsOpen(false),
+    });
 
   const addTag = (tag: string) => {
     if (maxSelections !== -1 && selected.length >= maxSelections) return;
@@ -44,6 +49,7 @@ export const TagInput = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (onSuggestionKeyDown(e)) return;
     if (e.key === "Enter") {
       e.preventDefault();
       if (input.trim()) addTag(input);
@@ -80,32 +86,26 @@ export const TagInput = ({
             </button>
           </span>
         ))}
-        {isOpen &&
-          availableOptions.length > 0 &&
-          (maxSelections === -1 || selected.length < maxSelections) && (
-            <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
-              {availableOptions.map((member) => (
-                <button
-                  key={member.name}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    addTag(member.name);
-                  }}
-                  className="w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center"
-                >
-                  <div className="flex flex-col">
-                    <span>{member.name}</span>
-                    {member.aliases && member.aliases.length > 0 && (
-                      <span className="text-sm text-slate-400 dark:text-muted-foreground">
-                        {member.aliases.join(", ")}
-                      </span>
-                    )}
-                  </div>
-                  <Plus size={14} className="text-slate-400 dark:text-muted-foreground" />
-                </button>
-              ))}
-            </div>
+        <MemberSuggestions
+          isOpen={canOpenSuggestions}
+          members={suggestions}
+          query={input}
+          excludeNames={selected}
+          limit={50}
+          activeIndex={activeIndex}
+          onMatchesChange={(next) => {
+            setMatches(next);
+            setActiveIndex(0);
+          }}
+          onPick={(member) => addTag(member.name)}
+          className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto"
+          renderRight={() => (
+            <Plus
+              size={14}
+              className="text-slate-400 dark:text-muted-foreground"
+            />
           )}
+        />
         <div className="relative flex-1 min-w-30">
           <input
             ref={inputRef}
