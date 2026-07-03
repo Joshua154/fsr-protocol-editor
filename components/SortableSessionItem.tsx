@@ -5,6 +5,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
 import {
   CommandArguments,
+  commandRequiresArguments,
+  insertAtCommandRange,
   RegisteredSessionCommand,
   sessionCommandRegistry,
 } from "@/common/sessionCommands";
@@ -262,44 +264,10 @@ export const SortableSessionItem = ({
     onClose: closeMention,
   });
 
-  const openCommandForm = useCallback((nextCommand: RegisteredSessionCommand) => {
-    setCommand((current) => ({
-      ...current,
-      isOpen: false,
-      selectedCommand: nextCommand,
-    }));
-  }, []);
+  const commandRef = useRef(command);
+  commandRef.current = command;
 
-  const applyCommand = useCallback(async (args: CommandArguments) => {
-    if (!command.selectedCommand || !command.target) return;
-    const target = command.target;
-    const text =
-      target.type === "topic"
-        ? item.topic
-        : item.points[target.idx] ?? "";
-    const triggerIndex = command.triggerIndex;
-    const cursorIndex = command.cursorIndex;
-    if (triggerIndex == null || cursorIndex == null) return;
-
-    const result = await command.selectedCommand.execute(args, {
-      sourceText: text,
-      triggerIndex,
-      cursorIndex,
-    });
-    const before = text.slice(0, triggerIndex);
-    const after = text.slice(cursorIndex);
-    const insert = result.text;
-    const needsSpace = after.length > 0 && !/^\s/.test(after);
-    const nextText = `${before}${insert}${needsSpace ? " " : ""}${after}`;
-    const nextCursor = (before + insert + (needsSpace ? " " : "")).length;
-
-    if (target.type === "topic") {
-      updateTopicTitle(item.id, nextText);
-    } else {
-      updatePoint(item.id, target.idx, nextText);
-    }
-
-    pendingSelectionRef.current = { target, pos: nextCursor };
+  const resetCommandState = useCallback(() => {
     setCommand({
       isOpen: false,
       target: null,
@@ -309,17 +277,70 @@ export const SortableSessionItem = ({
       cursorIndex: null,
       selectedCommand: null,
     });
-  }, [
-    command.cursorIndex,
-    command.selectedCommand,
-    command.target,
-    command.triggerIndex,
-    item.id,
-    item.points,
-    item.topic,
-    updatePoint,
-    updateTopicTitle,
-  ]);
+  }, []);
+
+  const executeCommand = useCallback(
+    async (
+      selectedCommand: RegisteredSessionCommand,
+      args: CommandArguments,
+      execution: Pick<CommandState, "target" | "triggerIndex" | "cursorIndex">
+    ) => {
+      const { target, triggerIndex, cursorIndex } = execution;
+      if (!target || triggerIndex == null || cursorIndex == null) return;
+
+      const text =
+        target.type === "topic"
+          ? item.topic
+          : item.points[target.idx] ?? "";
+
+      const result = await selectedCommand.execute(args, {
+        sourceText: text,
+        triggerIndex,
+        cursorIndex,
+      });
+      const { nextText, nextCursor } = insertAtCommandRange(
+        text,
+        triggerIndex,
+        cursorIndex,
+        result.text
+      );
+
+      if (target.type === "topic") {
+        updateTopicTitle(item.id, nextText);
+      } else {
+        updatePoint(item.id, target.idx, nextText);
+      }
+
+      pendingSelectionRef.current = { target, pos: nextCursor };
+      resetCommandState();
+    },
+    [item.id, item.points, item.topic, resetCommandState, updatePoint, updateTopicTitle]
+  );
+
+  const pickCommand = useCallback(
+    (nextCommand: RegisteredSessionCommand) => {
+      const current = commandRef.current;
+      if (!commandRequiresArguments(nextCommand)) {
+        setCommand((state) => ({ ...state, isOpen: false }));
+        void executeCommand(nextCommand, {}, current);
+        return;
+      }
+      setCommand({
+        ...current,
+        isOpen: false,
+        selectedCommand: nextCommand,
+      });
+    },
+    [executeCommand]
+  );
+
+  const applyCommand = useCallback(
+    async (args: CommandArguments) => {
+      if (!command.selectedCommand) return;
+      await executeCommand(command.selectedCommand, args, command);
+    },
+    [command, executeCommand]
+  );
 
   const {
     activeIndex: commandActiveIndex,
@@ -328,7 +349,7 @@ export const SortableSessionItem = ({
   } = useSuggestionNavigation({
     isOpen: command.isOpen,
     matches: commandMatches,
-    onPick: openCommandForm,
+    onPick: pickCommand,
     onClose: closeCommand,
   });
 
@@ -424,7 +445,7 @@ export const SortableSessionItem = ({
         isOpen={command.isOpen && !!command.anchor}
         commands={commandMatches}
         activeIndex={commandActiveIndex}
-        onPick={openCommandForm}
+        onPick={pickCommand}
         containerRef={commandDropdownRef}
         position="fixed"
         style={
@@ -439,20 +460,21 @@ export const SortableSessionItem = ({
         className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
       />
 
-      <Modal
-        isOpen={!!command.selectedCommand}
-        onClose={closeCommandForm}
-        title="Befehl ausführen"
-        width="sm"
-      >
-        {command.selectedCommand && (
+      {command.selectedCommand && commandRequiresArguments(command.selectedCommand) && (
+        <Modal
+          isOpen
+          onClose={closeCommandForm}
+          title="Befehl ausführen"
+          width="sm"
+        >
           <CommandArgumentForm
+            key={command.selectedCommand.name}
             command={command.selectedCommand}
             onSubmit={applyCommand}
             onCancel={closeCommandForm}
           />
-        )}
-      </Modal>
+        </Modal>
+      )}
 
       {/* Topic Header */}
       <div className="bg-slate-50 dark:bg-zinc-900 p-4 border-b border-slate-100 dark:border-border flex gap-4 items-center">

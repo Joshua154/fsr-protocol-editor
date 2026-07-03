@@ -1,10 +1,18 @@
-import React, { FormEvent, useMemo, useState } from "react";
+import React, { FormEvent, useCallback, useMemo, useState } from "react";
+import {
+  createInitialFormState,
+  getScalarInputType,
+  parseCommandArguments,
+  validateCommandArguments,
+  type CommandArgumentFormErrors,
+} from "@/common/commandArguments";
+import { isListArgumentSchema } from "@/common/sessionCommandBase";
 import type {
   CommandArguments,
-  CommandArgumentSchema,
-  CommandArgumentValue,
   RegisteredSessionCommand,
+  ScalarCommandArgumentSchema,
 } from "@/common/sessionCommands";
+import { CommandArgumentListInput } from "@/components/CommandArgumentListInput";
 
 type Props = {
   command: RegisteredSessionCommand;
@@ -12,86 +20,37 @@ type Props = {
   onCancel: () => void;
 };
 
-type FormState = Record<string, string>;
-type FormErrors = Record<string, string>;
-
-const parseArgument = (
-  schema: CommandArgumentSchema,
-  rawValue: string
-): CommandArgumentValue => {
-  const trimmedValue = rawValue.trim();
-
-  if (schema.type === "string") return trimmedValue;
-  if (schema.type === "boolean") return trimmedValue === "true";
-
-  const value = Number(trimmedValue);
-  if (schema.type === "integer") return Math.trunc(value);
-  return value;
-};
-
-const validateArgument = (
-  schema: CommandArgumentSchema,
-  rawValue: string
-): string | null => {
-  const trimmedValue = rawValue.trim();
-
-  if (schema.required && trimmedValue === "") return "Pflichtfeld";
-  if (!schema.required && trimmedValue === "") return null;
-
-  if (schema.type === "integer" || schema.type === "number") {
-    const value = Number(trimmedValue);
-    if (!Number.isFinite(value)) return "Bitte eine Zahl eingeben";
-    if (schema.type === "integer" && !Number.isInteger(value)) {
-      return "Bitte eine ganze Zahl eingeben";
-    }
-    if (schema.min != null && value < schema.min) {
-      return `Mindestens ${schema.min}`;
-    }
-    if (schema.max != null && value > schema.max) {
-      return `Maximal ${schema.max}`;
-    }
-  }
-
-  return null;
-};
+const fieldClassName =
+  "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-border dark:bg-zinc-950 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus:border-primary dark:focus:ring-indigo-950";
 
 export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
-  const initialValues = useMemo(
-    () =>
-      Object.fromEntries(
-        command.arguments.map((argument) => [argument.name, ""])
-      ) as FormState,
-    [command]
+  const initialState = useMemo(() => createInitialFormState(command), [command]);
+  const [scalarValues, setScalarValues] = useState(initialState.scalar);
+  const [listValues, setListValues] = useState(initialState.list);
+  const [errors, setErrors] = useState<CommandArgumentFormErrors>({});
+
+  const focusFirstField = useCallback(
+    (element: HTMLInputElement | HTMLSelectElement | null) => {
+      element?.focus();
+    },
+    []
   );
-  const [values, setValues] = useState<FormState>(initialValues);
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const nextErrors = Object.fromEntries(
-      command.arguments
-        .map((argument) => [
-          argument.name,
-          validateArgument(argument, values[argument.name] ?? ""),
-        ])
-        .filter((entry): entry is [string, string] => entry[1] != null)
-    );
+    const state = { scalar: scalarValues, list: listValues };
+    const nextErrors = validateCommandArguments(command, state);
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    const parsedArgs = Object.fromEntries(
-      command.arguments.map((argument) => [
-        argument.name,
-        parseArgument(argument, values[argument.name] ?? ""),
-      ])
-    );
-
-    onSubmit(parsedArgs);
+    onSubmit(parseCommandArguments(command, state));
   };
+
+  const firstFocusableArgumentName = command.arguments[0]?.name ?? null;
 
   return (
     <form onSubmit={submit} className="space-y-4">
@@ -106,52 +65,67 @@ export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
 
       <div className="space-y-3">
         {command.arguments.map((argument) => {
-          const error = errors[argument.name];
-          return (
-            <label key={argument.name} className="block space-y-1.5">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                {argument.label}
-              </span>
-              {argument.description && (
-                <span className="block text-xs text-slate-500 dark:text-muted-foreground">
-                  {argument.description}
+          if (isListArgumentSchema(argument)) {
+            const shouldFocus = argument.name === firstFocusableArgumentName;
+
+            return (
+              <div key={argument.name} className="block space-y-1.5">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {argument.label}
                 </span>
-              )}
-              {argument.type === "boolean" ? (
-                <select
-                  value={values[argument.name] ?? "false"}
-                  onChange={(event) => {
-                    setValues((current) => ({
+                {argument.description && (
+                  <span className="block text-xs text-slate-500 dark:text-muted-foreground">
+                    {argument.description}
+                  </span>
+                )}
+                <CommandArgumentListInput
+                  schema={argument}
+                  items={listValues[argument.name] ?? []}
+                  errors={errors}
+                  onChange={(items) => {
+                    setListValues((current) => ({
                       ...current,
-                      [argument.name]: event.target.value,
+                      [argument.name]: items,
                     }));
-                    setErrors((current) => ({ ...current, [argument.name]: "" }));
+                    setErrors((current) => {
+                      const next = { ...current };
+                      delete next[argument.name];
+                      items.forEach((_, itemIndex) => {
+                        for (const field of argument.fields) {
+                          delete next[`${argument.name}.${itemIndex}.${field.name}`];
+                        }
+                      });
+                      return next;
+                    });
                   }}
-                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-border dark:bg-zinc-950 dark:text-foreground dark:focus:border-primary dark:focus:ring-indigo-950"
-                >
-                  <option value="true">Ja</option>
-                  <option value="false">Nein</option>
-                </select>
-              ) : (
-                <input
-                  type={argument.type === "string" ? "text" : "number"}
-                  step={argument.type === "integer" ? 1 : "any"}
-                  min={argument.min}
-                  max={argument.max}
-                  value={values[argument.name] ?? ""}
-                  onChange={(event) => {
-                    setValues((current) => ({
-                      ...current,
-                      [argument.name]: event.target.value,
-                    }));
-                    setErrors((current) => ({ ...current, [argument.name]: "" }));
-                  }}
-                  placeholder={argument.placeholder}
-                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-border dark:bg-zinc-950 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus:border-primary dark:focus:ring-indigo-950"
+                  firstFieldRef={
+                    shouldFocus
+                      ? (element) => focusFirstField(element)
+                      : undefined
+                  }
                 />
-              )}
-              {error && <span className="text-xs text-red-500">{error}</span>}
-            </label>
+              </div>
+            );
+          }
+
+          const error = errors[argument.name];
+          const shouldFocus = argument.name === firstFocusableArgumentName;
+
+          return (
+            <ScalarField
+              key={argument.name}
+              schema={argument}
+              value={scalarValues[argument.name] ?? ""}
+              error={error}
+              inputRef={shouldFocus ? focusFirstField : undefined}
+              onChange={(value) => {
+                setScalarValues((current) => ({
+                  ...current,
+                  [argument.name]: value,
+                }));
+                setErrors((current) => ({ ...current, [argument.name]: "" }));
+              }}
+            />
           );
         })}
       </div>
@@ -172,5 +146,56 @@ export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
         </button>
       </div>
     </form>
+  );
+}
+
+function ScalarField({
+  schema,
+  value,
+  error,
+  inputRef,
+  onChange,
+}: {
+  schema: ScalarCommandArgumentSchema;
+  value: string;
+  error?: string;
+  inputRef?: (element: HTMLInputElement | HTMLSelectElement | null) => void;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+        {schema.label}
+      </span>
+      {schema.description && (
+        <span className="block text-xs text-slate-500 dark:text-muted-foreground">
+          {schema.description}
+        </span>
+      )}
+      {schema.type === "boolean" ? (
+        <select
+          ref={inputRef}
+          value={value || "false"}
+          onChange={(event) => onChange(event.target.value)}
+          className={fieldClassName}
+        >
+          <option value="true">Ja</option>
+          <option value="false">Nein</option>
+        </select>
+      ) : (
+        <input
+          ref={inputRef}
+          type={getScalarInputType(schema)}
+          step={schema.type === "integer" ? 1 : "any"}
+          min={schema.min}
+          max={schema.max}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={schema.placeholder}
+          className={fieldClassName}
+        />
+      )}
+      {error && <span className="text-xs text-red-500">{error}</span>}
+    </label>
   );
 }
