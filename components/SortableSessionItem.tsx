@@ -3,7 +3,15 @@ import { GripVertical, Trash2, Plus } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
+import {
+  CommandArguments,
+  RegisteredSessionCommand,
+  sessionCommandRegistry,
+} from "@/common/sessionCommands";
+import { CommandArgumentForm } from "@/components/CommandArgumentForm";
+import { CommandSuggestions } from "@/components/CommandSuggestions";
 import { MemberSuggestions } from "@/components/MemberSuggestions";
+import { Modal } from "@/components/Modal";
 import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
 
 interface SortableSessionItemProps {
@@ -27,6 +35,16 @@ type MentionState = {
   anchor: { top: number; left: number; width: number } | null;
   triggerIndex: number | null;
   cursorIndex: number | null;
+};
+
+type CommandState = {
+  isOpen: boolean;
+  target: MentionTarget | null;
+  query: string;
+  anchor: { top: number; left: number; width: number } | null;
+  triggerIndex: number | null;
+  cursorIndex: number | null;
+  selectedCommand: RegisteredSessionCommand | null;
 };
 
 export const SortableSessionItem = ({
@@ -57,6 +75,7 @@ export const SortableSessionItem = ({
   const topicRef = useRef<HTMLInputElement | null>(null);
   const pointRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const commandDropdownRef = useRef<HTMLDivElement | null>(null);
   const pendingSelectionRef = useRef<{
     target: MentionTarget;
     pos: number;
@@ -72,6 +91,17 @@ export const SortableSessionItem = ({
   });
 
   const [mentionMatches, setMentionMatches] = useState<Member[]>([]);
+  const [command, setCommand] = useState<CommandState>({
+    isOpen: false,
+    target: null,
+    query: "",
+    anchor: null,
+    triggerIndex: null,
+    cursorIndex: null,
+    selectedCommand: null,
+  });
+
+  const commandMatches = sessionCommandRegistry.filter(command.query);
 
   const getTargetEl = (target: MentionTarget | null) => {
     if (!target) return null;
@@ -91,6 +121,22 @@ export const SortableSessionItem = ({
     }));
   }, []);
 
+  const closeCommand = useCallback(() => {
+    setCommand((current) => ({
+      ...current,
+      isOpen: false,
+      target: null,
+      query: "",
+      anchor: null,
+      triggerIndex: null,
+      cursorIndex: null,
+    }));
+  }, []);
+
+  const closeCommandForm = useCallback(() => {
+    setCommand((current) => ({ ...current, selectedCommand: null }));
+  }, []);
+
   const findMentionContext = (text: string, cursorIndex: number) => {
     const uptoCursor = text.slice(0, cursorIndex);
     const at = uptoCursor.lastIndexOf("@");
@@ -100,6 +146,17 @@ export const SortableSessionItem = ({
     const query = uptoCursor.slice(at + 1);
     if (/\s/.test(query)) return null;
     return { triggerIndex: at, query };
+  };
+
+  const findCommandContext = (text: string, cursorIndex: number) => {
+    const uptoCursor = text.slice(0, cursorIndex);
+    const slash = uptoCursor.lastIndexOf("/");
+    if (slash < 0) return null;
+    const prev = slash === 0 ? "" : uptoCursor[slash - 1];
+    if (prev && !/\s|[([{"'`]/.test(prev)) return null;
+    const query = uptoCursor.slice(slash + 1);
+    if (/\s/.test(query)) return null;
+    return { triggerIndex: slash, query };
   };
 
   const updateMentionFromInput = (
@@ -126,6 +183,33 @@ export const SortableSessionItem = ({
       triggerIndex: ctx.triggerIndex,
       cursorIndex,
     }));
+  };
+
+  const updateCommandFromInput = (
+    target: MentionTarget,
+    el: HTMLInputElement | HTMLTextAreaElement | null,
+    text: string
+  ) => {
+    if (!el) return closeCommand();
+    const cursorIndex = el.selectionStart ?? text.length;
+    const ctx = findCommandContext(text, cursorIndex);
+    if (!ctx) return closeCommand();
+
+    const rect = el.getBoundingClientRect();
+    setCommand((current) => ({
+      ...current,
+      isOpen: true,
+      target,
+      query: ctx.query,
+      anchor: {
+        top: rect.bottom + 6,
+        left: rect.left,
+        width: rect.width,
+      },
+      triggerIndex: ctx.triggerIndex,
+      cursorIndex,
+    }));
+    closeMention();
   };
 
   const applyMention = useCallback((memberName: string) => {
@@ -178,13 +262,88 @@ export const SortableSessionItem = ({
     onClose: closeMention,
   });
 
+  const openCommandForm = useCallback((nextCommand: RegisteredSessionCommand) => {
+    setCommand((current) => ({
+      ...current,
+      isOpen: false,
+      selectedCommand: nextCommand,
+    }));
+  }, []);
+
+  const applyCommand = useCallback(async (args: CommandArguments) => {
+    if (!command.selectedCommand || !command.target) return;
+    const target = command.target;
+    const text =
+      target.type === "topic"
+        ? item.topic
+        : item.points[target.idx] ?? "";
+    const triggerIndex = command.triggerIndex;
+    const cursorIndex = command.cursorIndex;
+    if (triggerIndex == null || cursorIndex == null) return;
+
+    const result = await command.selectedCommand.execute(args, {
+      sourceText: text,
+      triggerIndex,
+      cursorIndex,
+    });
+    const before = text.slice(0, triggerIndex);
+    const after = text.slice(cursorIndex);
+    const insert = result.text;
+    const needsSpace = after.length > 0 && !/^\s/.test(after);
+    const nextText = `${before}${insert}${needsSpace ? " " : ""}${after}`;
+    const nextCursor = (before + insert + (needsSpace ? " " : "")).length;
+
+    if (target.type === "topic") {
+      updateTopicTitle(item.id, nextText);
+    } else {
+      updatePoint(item.id, target.idx, nextText);
+    }
+
+    pendingSelectionRef.current = { target, pos: nextCursor };
+    setCommand({
+      isOpen: false,
+      target: null,
+      query: "",
+      anchor: null,
+      triggerIndex: null,
+      cursorIndex: null,
+      selectedCommand: null,
+    });
+  }, [
+    command.cursorIndex,
+    command.selectedCommand,
+    command.target,
+    command.triggerIndex,
+    item.id,
+    item.points,
+    item.topic,
+    updatePoint,
+    updateTopicTitle,
+  ]);
+
+  const {
+    activeIndex: commandActiveIndex,
+    onKeyDown: onCommandKeyDown,
+    setActiveIndex: setCommandActiveIndex,
+  } = useSuggestionNavigation({
+    isOpen: command.isOpen,
+    matches: commandMatches,
+    onPick: openCommandForm,
+    onClose: closeCommand,
+  });
+
   const onEditorKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      if (onCommandKeyDown(e)) return;
       if (onMentionKeyDown(e)) return;
       e.stopPropagation();
     },
-    [onMentionKeyDown]
+    [onCommandKeyDown, onMentionKeyDown]
   );
+
+  useEffect(() => {
+    setCommandActiveIndex(0);
+  }, [command.query, setCommandActiveIndex]);
 
   useLayoutEffect(() => {
     const pending = pendingSelectionRef.current;
@@ -211,6 +370,19 @@ export const SortableSessionItem = ({
     window.addEventListener("mousedown", onMouseDown);
     return () => window.removeEventListener("mousedown", onMouseDown);
   }, [mention.isOpen, mention.target, closeMention]);
+
+  useEffect(() => {
+    if (!command.isOpen) return;
+    const onMouseDown = (ev: MouseEvent) => {
+      const target = ev.target as Node | null;
+      const el = getTargetEl(command.target);
+      if (commandDropdownRef.current?.contains(target as Node)) return;
+      if (el?.contains(target as Node)) return;
+      closeCommand();
+    };
+    window.addEventListener("mousedown", onMouseDown);
+    return () => window.removeEventListener("mousedown", onMouseDown);
+  }, [command.isOpen, command.target, closeCommand]);
 
   return (
     <div
@@ -248,6 +420,40 @@ export const SortableSessionItem = ({
         className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
       />
 
+      <CommandSuggestions
+        isOpen={command.isOpen && !!command.anchor}
+        commands={commandMatches}
+        activeIndex={commandActiveIndex}
+        onPick={openCommandForm}
+        containerRef={commandDropdownRef}
+        position="fixed"
+        style={
+          command.anchor
+            ? {
+                top: command.anchor.top,
+                left: command.anchor.left,
+                width: command.anchor.width,
+              }
+            : undefined
+        }
+        className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
+      />
+
+      <Modal
+        isOpen={!!command.selectedCommand}
+        onClose={closeCommandForm}
+        title="Befehl ausführen"
+        width="sm"
+      >
+        {command.selectedCommand && (
+          <CommandArgumentForm
+            command={command.selectedCommand}
+            onSubmit={applyCommand}
+            onCancel={closeCommandForm}
+          />
+        )}
+      </Modal>
+
       {/* Topic Header */}
       <div className="bg-slate-50 dark:bg-zinc-900 p-4 border-b border-slate-100 dark:border-border flex gap-4 items-center">
         {/* Drag Handle */}
@@ -267,6 +473,7 @@ export const SortableSessionItem = ({
           onChange={(e) => {
             updateTopicTitle(item.id, e.target.value);
             updateMentionFromInput({ type: "topic" }, e.currentTarget, e.target.value);
+            updateCommandFromInput({ type: "topic" }, e.currentTarget, e.target.value);
           }}
           className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-foreground placeholder-slate-400 dark:placeholder-muted-foreground outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
           placeholder="Thema Titel..."
@@ -295,6 +502,11 @@ export const SortableSessionItem = ({
               onChange={(e) => {
                 updatePoint(item.id, idx, e.target.value);
                 updateMentionFromInput(
+                  { type: "point", idx },
+                  e.currentTarget,
+                  e.target.value
+                );
+                updateCommandFromInput(
                   { type: "point", idx },
                   e.currentTarget,
                   e.target.value
