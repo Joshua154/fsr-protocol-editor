@@ -12,8 +12,8 @@ interface MetaSectionProps {
   availableAssocMembers: Member[];
   protocolant: string[];
   setProtocolant: (val: string[]) => void;
-  meta: { Date: string; Start: string; Ende: string };
-  setMeta: (val: { Date: string; Start: string; Ende: string }) => void;
+  meta: { Date: string; Start: string; Ende: string; Location: string; Room: string };
+  setMeta: (val: { Date: string; Start: string; Ende: string; Location: string; Room: string }) => void;
 }
 
 const getCurrentTimeString = (): string => {
@@ -130,6 +130,27 @@ export const MetaSection = ({
             setSelected={setProtocolant}
             suggestions={availableFsrMembers}
             maxSelections={1}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
+            Ort
+          </label>
+          <input
+            type="text"
+            value={meta.Location || ""}
+            onChange={(e) => setMeta({ ...meta, Location: e.target.value })}
+            className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+          />
+
+          <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
+            Raum
+          </label>
+          <input
+            type="text"
+            value={meta.Room || ""}
+            onChange={(e) => setMeta({ ...meta, Room: e.target.value })}
+            className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
           />
         </div>
       </div>

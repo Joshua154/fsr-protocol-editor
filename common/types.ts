@@ -24,4 +24,7 @@ export type Member = {
 export type EnvVariables = {
   FSR_MEMBERS?: Member[] | string;
   ASSOCIATED_MEMBERS?: Member[] | string;
+  DEFAULT_START_TIME?: string;
+  DEFAULT_LOCATION?: string;
+  DEFAULT_ROOM?: string;
 };

@@ -25,11 +25,17 @@ import { Member } from "@/common/types";
 interface ProtocolEditorProps {
   availableFsrMembers: Member[];
   availableAssocMembers: Member[];
+  defaultStartTime?: string;
+  defaultLocation?: string;
+  defaultRoom?: string;
 }
 
 export function ProtocolEditor({
   availableFsrMembers,
   availableAssocMembers,
+  defaultStartTime,
+  defaultLocation,
+  defaultRoom,
 }: ProtocolEditorProps) {
   const memberSuggestions = React.useMemo(
     () => [...availableFsrMembers, ...availableAssocMembers],
@@ -59,7 +65,7 @@ export function ProtocolEditor({
     removePoint,
     handleDragEnd,
     resetProtocol,
-  } = useProtocol();
+  } = useProtocol({ defaultStartTime, defaultLocation, defaultRoom });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

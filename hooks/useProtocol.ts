@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import yaml from "js-yaml";
 import { SessionItem, ProtocolData } from "@/common/types";
 import { sessionObjectToArray, sessionArrayToObject } from "@/common/utils";
@@ -6,21 +6,47 @@ import { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { sendToDiscord } from "@/app/actions";
 import { useDialog } from "@/components/DialogProvider";
+type MetaData = {
+  Date: string;
+  Start: string;
+  Ende: string;
+  Location: string;
+  Room: string;
+};
+
+type ProtocolDefaults = {
+  defaultStartTime?: string;
+  defaultLocation?: string;
+  defaultRoom?: string;
+};
+
+const buildDefaultMeta = (defaults?: ProtocolDefaults): MetaData => ({
+  Date: new Date().toISOString().split("T")[0],
+  Start: defaults?.defaultStartTime || "",
+  Ende: "",
+  Location: defaults?.defaultLocation || "",
+  Room: defaults?.defaultRoom || "",
+});
+
 
 const STORAGE_KEY = "fsr-protocol-data";
 
-export const useProtocol = () => {
+export const useProtocol = ({
+  defaultStartTime,
+  defaultLocation,
+  defaultRoom,
+}: ProtocolDefaults = {}) => {
   const { confirm, alert, prompt } = useDialog();
+  const defaultMeta = useMemo(
+    () => buildDefaultMeta({ defaultStartTime, defaultLocation, defaultRoom }),
+    [defaultStartTime, defaultLocation, defaultRoom]
+  );
   const [isLoaded, setIsLoaded] = useState(false);
   const [fsrMembers, setFsrMembers] = useState<string[]>([]);
   const [guests, setGuests] = useState<string[]>([]);
   const [protocolant, setProtocolant] = useState<string[]>([]);
 
-  const [meta, setMeta] = useState({
-    Date: new Date().toISOString().split("T")[0],
-    Start: "16:30",
-    Ende: "17:30",
-  });
+  const [meta, setMeta] = useState(defaultMeta);
   const [sessionItems, setSessionItems] = useState<SessionItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,20 +59,14 @@ export const useProtocol = () => {
         setFsrMembers(parsed.fsrMembers || []);
         setGuests(parsed.guests || []);
         setProtocolant(parsed.protocolant || []);
-        setMeta(
-          parsed.meta || {
-            Date: new Date().toISOString().split("T")[0],
-            Start: "16:30",
-            Ende: "17:30",
-          }
-        );
+        setMeta(parsed.meta ? { ...defaultMeta, ...parsed.meta } : defaultMeta);
         setSessionItems(parsed.sessionItems || []);
       } catch (e) {
         console.error("Failed to load protocol data", e);
       }
     }
     setIsLoaded(true);
-  }, []);
+  }, [defaultMeta]);
 
   // Save to LocalStorage on change
   useEffect(() => {
@@ -74,11 +94,7 @@ export const useProtocol = () => {
     setFsrMembers([]);
     setGuests([]);
     setProtocolant([]);
-    setMeta({
-      Date: new Date().toISOString().split("T")[0],
-      Start: "16:30",
-      Ende: "17:30",
-    });
+    setMeta(defaultMeta);
     setSessionItems([]);
   };
 
@@ -103,8 +119,10 @@ export const useProtocol = () => {
         Date: parsed.Date
           ? new Date(parsed.Date).toISOString().split("T")[0]
           : new Date().toISOString().split("T")[0],
-        Start: parsed.Start ? String(parsed.Start) : "16:30",
-        Ende: parsed.Ende ? String(parsed.Ende) : "17:30",
+        Start: parsed.Start ? String(parsed.Start) : defaultMeta.Start,
+        Ende: parsed.Ende ? String(parsed.Ende) : defaultMeta.Ende,
+        Location: parsed.Location ? String(parsed.Location) : defaultMeta.Location,
+        Room: parsed.Room ? String(parsed.Room) : defaultMeta.Room,
       });
 
       if (parsed.Sitzung) {
@@ -174,6 +192,8 @@ export const useProtocol = () => {
     Date: meta.Date,
     Start: meta.Start,
     Ende: meta.Ende,
+    Location: meta.Location,
+    Room: meta.Room,
     Sitzung: sessionArrayToObject(sessionItems),
   });
 
