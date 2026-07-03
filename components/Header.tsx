@@ -1,6 +1,7 @@
 import React from "react";
 import { FileText, Clipboard, Upload, Save, RotateCcw, Send } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { AppButton } from "@/components/ui";
 
 interface HeaderProps {
   handlePasteFromClipboard: () => void;
@@ -34,20 +35,20 @@ export const Header = ({
         </div>
         <div className="flex gap-2">
           <ThemeToggle />
-          <button
+          <AppButton
             onClick={resetProtocol}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-transparent rounded-lg transition-colors"
+            variant="dangerSoft"
             title="Protokoll zurücksetzen"
           >
             <RotateCcw size={16} /> <span className="hidden sm:inline">Reset</span>
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            variant="outline"
           >
             <Clipboard size={16} />{" "}
             <span className="hidden sm:inline">Clipboard</span>
-          </button>
+          </AppButton>
           <input
             type="file"
             accept=".yaml,.yml"
@@ -55,25 +56,25 @@ export const Header = ({
             className="hidden"
             onChange={handleFileUpload}
           />
-          <button
+          <AppButton
             onClick={handleImportFileClick}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            variant="secondary"
           >
             <Upload size={16} /> <span className="hidden sm:inline">Import</span>
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
+            variant="primary"
           >
             <Save size={16} /> <span className="hidden sm:inline">Export</span>
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             onClick={handleSendToDiscord}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
+            variant="primary"
             title="An Discord senden"
           >
             <Send size={16} /> <span className="hidden sm:inline">Discord</span>
-          </button>
+          </AppButton>
         </div>
       </div>
     </header>

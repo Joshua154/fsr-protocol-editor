@@ -109,13 +109,6 @@ async function screenshot(page: Page, outPath: string) {
     await page.screenshot({ path: outPath, fullPage: true });
 }
 
-async function waitForDialog(page: Page) {
-    await page
-        .locator('[role="dialog"]')
-        .first()
-        .waitFor({ state: "visible", timeout: 5000 });
-}
-
 async function openMemberSuggestions(page: Page) {
     const tagInput = page
         .locator("div")

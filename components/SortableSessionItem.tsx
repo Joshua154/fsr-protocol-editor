@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
 import { MemberSuggestions } from "@/components/MemberSuggestions";
+import { AppButton, AppInput, AppTextarea } from "@/components/ui";
 import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
 
 interface SortableSessionItemProps {
@@ -260,7 +261,7 @@ export const SortableSessionItem = ({
           <GripVertical size={20} />
         </div>
         
-        <input
+        <AppInput
           ref={topicRef}
           type="text"
           value={item.topic}
@@ -268,18 +269,20 @@ export const SortableSessionItem = ({
             updateTopicTitle(item.id, e.target.value);
             updateMentionFromInput({ type: "topic" }, e.currentTarget, e.target.value);
           }}
-          className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-foreground placeholder-slate-400 dark:placeholder-muted-foreground outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
+          variant="transparent"
+          className="flex-1 text-lg font-semibold focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
           placeholder="Thema Titel..."
           onKeyDown={onEditorKeyDown} // Stop DND from interfering with typing
           onBlur={() => setTimeout(() => closeMention(), 80)}
         />
-        <button
+        <AppButton
           onClick={() => removeTopic(item.id)}
-          className="text-slate-400 dark:text-muted-foreground hover:text-red-500 dark:hover:text-red-400 transition-colors p-2"
+          variant="ghost"
+          size="icon"
           title="Thema löschen"
         >
           <Trash2 size={18} />
-        </button>
+        </AppButton>
       </div>
 
       {/* Bullet Points */}
@@ -287,7 +290,7 @@ export const SortableSessionItem = ({
         {item.points.map((point, idx) => (
           <div key={idx} className="flex gap-3 items-start group/point">
             <div className="mt-3.5 w-1.5 h-1.5 bg-indigo-500 rounded-full shrink-0"></div>
-            <textarea
+            <AppTextarea
               ref={(el) => {
                 pointRefs.current[idx] = el;
               }}
@@ -300,7 +303,8 @@ export const SortableSessionItem = ({
                   e.target.value
                 );
               }}
-              className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 dark:focus:border-primary outline-none py-1 text-slate-600 dark:text-foreground leading-relaxed"
+              variant="transparent"
+              className="flex-1"
               rows={
                 point == null || point === ""
                   ? 1
@@ -310,20 +314,24 @@ export const SortableSessionItem = ({
               onKeyDown={onEditorKeyDown}
               onBlur={() => setTimeout(() => closeMention(), 80)}
             />
-            <button
+            <AppButton
               onClick={() => removePoint(item.id, idx)}
-              className="opacity-0 group-hover/point:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-400 dark:hover:text-red-400 transition-all p-1"
+              variant="ghost"
+              size="icon"
+              className="opacity-0 group-hover/point:opacity-100"
+              title="Punkt löschen"
             >
               <Trash2 size={14} />
-            </button>
+            </AppButton>
           </div>
         ))}
-        <button
+        <AppButton
           onClick={() => addPoint(item.id)}
-          className="ml-5 text-md text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
+          variant="link"
+          className="ml-5 mt-2"
         >
           <Plus size={14} /> Punkt hinzufügen
-        </button>
+        </AppButton>
       </div>
     </div>
   );

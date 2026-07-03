@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
+import { AppButton } from "@/components/ui"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -15,19 +16,20 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="p-2 rounded-lg text-slate-600 border border-transparent">
+      <AppButton variant="ghost" size="icon" aria-label="Theme wird geladen">
          <span className="w-5 h-5 block" />
-      </button>
+      </AppButton>
     )
   }
 
   return (
-    <button
+    <AppButton
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+      variant="ghost"
+      size="icon"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? <Moon size={20} /> : <Sun size={20} />}
-    </button>
+    </AppButton>
   )
 }

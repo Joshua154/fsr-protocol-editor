@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Member } from "@/common/types";
+import { AppButton } from "@/components/ui";
 
 type Props = {
   members: Member[];
@@ -26,18 +27,17 @@ export function MemberSuggestionList({
   return (
     <>
       {members.map((member, idx) => (
-        <button
+        <AppButton
           key={member.name}
           ref={(el) => {
             itemRefs.current[idx] = el;
           }}
+          variant="suggestion"
+          data-active={idx === activeIndex ? "true" : undefined}
           onMouseDown={(e) => {
             e.preventDefault();
             onPick(member);
           }}
-          className={`w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center ${
-            idx === activeIndex ? "bg-indigo-50 dark:bg-zinc-800" : ""
-          }`}
         >
           <div className="flex flex-col">
             <span>{member.name}</span>
@@ -48,7 +48,7 @@ export function MemberSuggestionList({
             )}
           </div>
           {renderRight ? renderRight(member) : null}
-        </button>
+        </AppButton>
       ))}
     </>
   );

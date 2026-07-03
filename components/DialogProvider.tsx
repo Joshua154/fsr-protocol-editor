@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Modal } from "@/components/Modal";
+import { AppButton, AppInput } from "@/components/ui";
 
 type DialogType = "alert" | "confirm" | "prompt";
 
@@ -148,10 +149,9 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
             </p>
 
             {dialog.type === "prompt" && (
-              <input
+              <AppInput
                 type={(dialog.options as DialogOptionsPrompt).hiddenInput ? "password" : "text"}
                 autoFocus
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -161,23 +161,21 @@ export const DialogProvider = ({ children }: { children: React.ReactNode }) => {
 
             <div className="flex justify-end gap-2 pt-2">
               {dialog.type !== "alert" && (
-                <button
+                <AppButton
                   onClick={handleClose}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+                  variant="ghost"
+                  size="sm"
                 >
                   {dialog.options.cancelText}
-                </button>
+                </AppButton>
               )}
-              <button
+              <AppButton
                 onClick={handleConfirm}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-md shadow-sm transition-colors ${
-                  dialog.options.destructive
-                    ? "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
-                    : "bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500"
-                }`}
+                variant={dialog.options.destructive ? "destructive" : "primary"}
+                size="sm"
               >
                 {dialog.options.confirmText}
-              </button>
+              </AppButton>
             </div>
           </div>
         </Modal>

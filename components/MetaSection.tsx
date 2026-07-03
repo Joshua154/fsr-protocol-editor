@@ -2,6 +2,7 @@ import React from "react";
 import { Users, Calendar } from "lucide-react";
 import { TagInput } from "./TagInput";
 import { Member } from "@/common/types";
+import { AppButton, AppInput } from "@/components/ui";
 
 interface MetaSectionProps {
   fsrMembers: string[];
@@ -63,20 +64,19 @@ export const MetaSection = ({
           <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
             Datum
           </label>
-          <input
+          <AppInput
             type="date"
             value={meta.Date}
             onChange={(e) => setMeta({ ...meta, Date: e.target.value })}
-            className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
           />
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
               Start{" "}
-              <button
+              <AppButton
                 type="button"
-                className="text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
+                variant="link"
                 onClick={() =>
                   setMeta({
                     ...meta,
@@ -85,22 +85,21 @@ export const MetaSection = ({
                 }
               >
                 jetzt
-              </button>
+              </AppButton>
             </label>
-            <input
+            <AppInput
               type="time"
               step="1"
               value={meta.Start}
-              onChange={(e) => {console.log(e.target.value); setMeta({ ...meta, Start: e.target.value })}}
-              className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+              onChange={(e) => setMeta({ ...meta, Start: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
               Ende{" "}
-              <button
+              <AppButton
                 type="button"
-                className="text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
+                variant="link"
                 onClick={() =>
                   setMeta({
                     ...meta,
@@ -109,14 +108,13 @@ export const MetaSection = ({
                 }
               >
                 jetzt
-              </button>
+              </AppButton>
             </label>
-            <input
+            <AppInput
               type="time"
               step="1"
               value={meta.Ende}
               onChange={(e) => setMeta({ ...meta, Ende: e.target.value })}
-              className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
             />
           </div>
         </div>
@@ -136,21 +134,19 @@ export const MetaSection = ({
           <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
             Ort
           </label>
-          <input
+          <AppInput
             type="text"
             value={meta.Location || ""}
             onChange={(e) => setMeta({ ...meta, Location: e.target.value })}
-            className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
           />
 
           <label className="block text-sm font-medium text-slate-500 dark:text-muted-foreground mb-1">
             Raum
           </label>
-          <input
+          <AppInput
             type="text"
             value={meta.Room || ""}
             onChange={(e) => setMeta({ ...meta, Room: e.target.value })}
-            className="w-full p-2 rounded-lg bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-foreground border border-slate-200 dark:border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
           />
         </div>
       </div>

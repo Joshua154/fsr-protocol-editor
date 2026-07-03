@@ -2,6 +2,7 @@ import React, { useRef, useState, KeyboardEvent } from "react";
 import { X, Plus } from "lucide-react";
 import { Member } from "@/common/types";
 import { MemberSuggestions } from "@/components/MemberSuggestions";
+import { AppButton, AppInput } from "@/components/ui";
 import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
 
 interface TagInputProps {
@@ -75,15 +76,17 @@ export const TagInput = ({
             className="flex items-center gap-1 px-2 py-1 text-md bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
           >
             {tag}
-            <button
+            <AppButton
               onClick={(e) => {
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer"
+              variant="ghost"
+              size="inlineIcon"
+              aria-label={`${tag} entfernen`}
             >
               <X size={14} />
-            </button>
+            </AppButton>
           </span>
         ))}
         <MemberSuggestions
@@ -107,7 +110,7 @@ export const TagInput = ({
           )}
         />
         <div className="relative flex-1 min-w-30">
-          <input
+          <AppInput
             ref={inputRef}
             type="text"
             value={input}
@@ -119,7 +122,8 @@ export const TagInput = ({
             onBlur={() => setTimeout(() => setIsOpen(false), 50)}
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-foreground"
+            variant="transparent"
+            className="h-full py-1"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
           />
         </div>

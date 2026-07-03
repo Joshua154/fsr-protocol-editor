@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { AppButton } from "@/components/ui";
 
 interface ModalProps {
   isOpen: boolean;
@@ -57,12 +58,14 @@ export const Modal = ({
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             {title}
           </h3>
-          <button
+          <AppButton
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
+            variant="ghost"
+            size="icon"
+            aria-label="Dialog schließen"
           >
             <X size={20} />
-          </button>
+          </AppButton>
         </div>
         <div className="p-6 overflow-y-auto max-h-[80vh]">{children}</div>
       </div>

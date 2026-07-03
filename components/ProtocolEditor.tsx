@@ -20,6 +20,7 @@ import { useProtocol } from "@/hooks/useProtocol";
 import { Header } from "@/components/Header";
 import { MetaSection } from "@/components/MetaSection";
 import { SortableSessionItem } from "@/components/SortableSessionItem";
+import { AppButton } from "@/components/ui";
 import { Member } from "@/common/types";
 
 interface ProtocolEditorProps {
@@ -110,12 +111,13 @@ export function ProtocolEditor({
             <h2 className="text-xl font-bold text-slate-800 dark:text-foreground">
               Sitzungsinhalte
             </h2>
-            <button
+            <AppButton
               onClick={addTopic}
-              className="flex items-center gap-1 text-sm text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
+              variant="link"
+              size="sm"
             >
               <Plus size={16} /> Neues Thema
-            </button>
+            </AppButton>
           </div>
 
           <DndContext
