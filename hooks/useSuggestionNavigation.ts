@@ -1,19 +1,18 @@
 import { useCallback, useMemo, useState } from "react";
-import type { Member } from "@/common/types";
 
-type Options = {
+type Options<T> = {
   isOpen: boolean;
-  matches: Member[];
-  onPick: (member: Member) => void;
+  matches: T[];
+  onPick: (item: T) => void;
   onClose?: () => void;
 };
 
-export function useSuggestionNavigation({
+export function useSuggestionNavigation<T>({
   isOpen,
   matches,
   onPick,
   onClose,
-}: Options) {
+}: Options<T>) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const clampedActiveIndex = useMemo(() => {
