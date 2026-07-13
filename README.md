@@ -6,6 +6,7 @@ A web-based editor for managing and generating protocols for Student Council (FS
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Built with devenv](https://devenv.sh/assets/devenv-badge.svg)](https://devenv.sh)
 [![wakatime](https://wakatime.com/badge/user/04b6ff37-1c8c-4a0c-bf7e-85a2901d61d1/project/d96edfb2-e2ca-4dd8-a18a-d19d5f419d85.svg)](https://wakatime.com/badge/user/04b6ff37-1c8c-4a0c-bf7e-85a2901d61d1/project/d96edfb2-e2ca-4dd8-a18a-d19d5f419d85)
 
 ## Tech Stack
@@ -26,10 +27,10 @@ npm run previews:install
 npm run previews
 ```
 
-On **NixOS**, Playwright's downloaded browsers may not run (stub-ld). Use dev shell bundled Chromium instead:
+On **NixOS**, Playwright's downloaded browsers may not run (stub-ld). Use devenv's bundled Chromium instead:
 
 ```bash
-nix develop
+devenv shell
 npm run previews
 ```
 
@@ -76,10 +77,9 @@ npm run previews
 
 ### Prerequisites
 
-- Node.js (Latest LTS recommended)
-- npm, yarn, or pnpm
+- [Nix](https://nixos.org/download/) and [devenv](https://devenv.sh/getting-started/) (recommended), or Node.js 22+ with npm
 
-### Installation
+### Development with devenv
 
 1.  Clone the repository:
     ```bash
@@ -87,30 +87,52 @@ npm run previews
     cd fsr-protocol-editor
     ```
 
-2.  Install dependencies:
+2.  Enter the developer environment:
     ```bash
-    npm install
+    devenv shell
     ```
+    With [direnv](https://direnv.net/) installed, run `direnv allow` once; the environment activates automatically when you `cd` into the repo.
 
-3.  Configure Environment Variables:
-
-    Copy the example environment file:
+3.  On first entry, devenv runs `npm install` and copies `example.env.local` to `.env.local` if it does not exist. Edit `.env.local` with your secrets (declared in [`secretspec.toml`](secretspec.toml)), then reload the environment:
     ```bash
-    cp example.env.local .env.local
+    direnv reload   # or re-run devenv shell
     ```
-
-    Edit `.env.local` to set your default FSR members and associated members:
+    Example values:
     ```env
     FSR_MEMBERS=Member1,Member2,Member3
     ASSOCIATED_MEMBERS=Guest1,Guest2
     ```
+    You can also manage secrets with the [SecretSpec](https://secretspec.dev/) CLI: `secretspec set FSR_MEMBERS --provider dotenv:.env.local`
 
 4.  Run the development server:
     ```bash
     npm run dev
     ```
+    Or start it via the process manager:
+    ```bash
+    devenv up
+    ```
 
 5.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Installation without devenv
+
+1.  Clone the repository and install dependencies:
+    ```bash
+    git clone https://github.com/Joshua154/fsr-protocol-editor.git
+    cd fsr-protocol-editor
+    npm install
+    ```
+
+2.  Configure environment variables:
+    ```bash
+    cp example.env.local .env.local
+    ```
+
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
 ### Running with Docker
 

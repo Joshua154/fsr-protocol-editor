@@ -302,7 +302,7 @@ async function run() {
                 /NixOS cannot run dynamically linked executables|stub-ld/i.test(
                     err.message,
                 )
-                ? "\n\nNixOS hint: Playwright's downloaded Chromium won't run on NixOS. Install system Chromium and re-run with either:\n  CHROMIUM_PATH=$(command -v chromium) npm run previews -- --smoke\n  # or\n  npm run previews -- --smoke --chromium $(command -v chromium)\n\nIf you're using the flake devShell, add pkgs.chromium to devShell packages."
+                ? "\n\nNixOS hint: Playwright's downloaded Chromium won't run on NixOS. Install system Chromium and re-run with either:\n  CHROMIUM_PATH=$(command -v chromium) npm run previews -- --smoke\n  # or\n  npm run previews -- --smoke --chromium $(command -v chromium)\n\nIf you're using devenv, Chromium is already provided via CHROMIUM_PATH."
                 : "";
         failWithLogs(
             new Error(`${err instanceof Error ? err.message : String(err)}${hint}`),
