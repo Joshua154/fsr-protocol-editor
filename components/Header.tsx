@@ -1,6 +1,14 @@
 import React from "react";
-import { FileText, Clipboard, Upload, Save, RotateCcw, Send } from "lucide-react";
+import {
+  Clipboard,
+  Download,
+  FileText,
+  RotateCcw,
+  Send,
+  Upload,
+} from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { Button } from "@/components/ui/Primitives";
 
 interface HeaderProps {
   handlePasteFromClipboard: () => void;
@@ -22,32 +30,43 @@ export const Header = ({
   resetProtocol,
 }: HeaderProps) => {
   return (
-    <header className="bg-white dark:bg-background border-b border-slate-200 dark:border-border sticky top-0 z-10 transition-colors">
-      <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 dark:bg-indigo-500 p-2 rounded-lg text-white">
-            <FileText size={20} />
+    <header className="print:hidden sticky top-0 z-40 border-b border-[var(--glass-border)] bg-[color:var(--card)]/90 backdrop-blur-2xl backdrop-saturate-150">
+      <div className="mx-auto flex max-w-[1640px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_8px_22px_rgba(53,104,232,.25)]">
+            <FileText size={19} strokeWidth={2.2} />
           </div>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-foreground">
-            FSR Protokoll Editor
-          </h1>
+          <div className="min-w-0">
+            <p className="text-[0.625rem] font-bold uppercase tracking-[0.14em] text-primary">
+              FSR Informatik
+            </p>
+            <h1 className="truncate text-base font-bold leading-tight tracking-[-0.025em] text-foreground sm:text-lg">
+              Protokoll Editor
+            </h1>
+          </div>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex max-w-full items-center gap-1.5 overflow-x-auto py-0.5 subtle-scrollbar">
           <ThemeToggle />
-          <button
+          <Button
             onClick={resetProtocol}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-transparent rounded-lg transition-colors"
+            variant="quiet"
+            size="icon"
+            aria-label="Protokoll zurücksetzen"
             title="Protokoll zurücksetzen"
+            className="text-destructive hover:bg-[var(--destructive-soft)] hover:text-destructive"
           >
-            <RotateCcw size={16} /> <span className="hidden sm:inline">Reset</span>
-          </button>
-          <button
+            <RotateCcw size={17} />
+          </Button>
+          <Button
             onClick={handlePasteFromClipboard}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            variant="secondary"
+            size="sm"
+            title="Aus der Zwischenablage einfügen"
           >
-            <Clipboard size={16} />{" "}
-            <span className="hidden sm:inline">Clipboard</span>
-          </button>
+            <Clipboard size={16} />
+            <span className="hidden md:inline">Einfügen</span>
+          </Button>
           <input
             type="file"
             accept=".yaml,.yml"
@@ -55,25 +74,33 @@ export const Header = ({
             className="hidden"
             onChange={handleFileUpload}
           />
-          <button
+          <Button
             onClick={handleImportFileClick}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-slate-600 dark:text-gray-300 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+            variant="secondary"
+            size="sm"
+            title="YAML-Datei importieren"
           >
-            <Upload size={16} /> <span className="hidden sm:inline">Import</span>
-          </button>
-          <button
+            <Upload size={16} />
+            <span className="hidden sm:inline">Import</span>
+          </Button>
+          <Button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
+            variant="secondary"
+            size="sm"
+            title="Als YAML-Datei exportieren"
           >
-            <Save size={16} /> <span className="hidden sm:inline">Export</span>
-          </button>
-          <button
+            <Download size={16} />
+            <span className="hidden sm:inline">Export</span>
+          </Button>
+          <Button
             onClick={handleSendToDiscord}
-            className="flex items-center gap-2 px-4 py-2 text-md font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 rounded-lg shadow-sm transition-colors"
-            title="An Discord senden"
+            variant="primary"
+            size="sm"
+            title="Protokoll an Discord senden"
           >
-            <Send size={16} /> <span className="hidden sm:inline">Discord</span>
-          </button>
+            <Send size={16} />
+            <span className="hidden sm:inline">An Discord</span>
+          </Button>
         </div>
       </div>
     </header>

@@ -33,7 +33,7 @@ export function MemberSuggestionDropdown({
       style={{ position, ...style }}
       className={
         className ??
-        "bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20"
+        "glass-popover materialize z-20 rounded-xl p-1"
       }
     >
       <MemberSuggestionList

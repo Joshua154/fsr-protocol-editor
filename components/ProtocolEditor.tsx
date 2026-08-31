@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Plus } from "lucide-react";
+import { AtSign, FilePlus2, ListChecks, Plus, Terminal } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -21,6 +21,12 @@ import { Header } from "@/components/Header";
 import { MetaSection } from "@/components/MetaSection";
 import { SortableSessionItem } from "@/components/SortableSessionItem";
 import { Member } from "@/common/types";
+import {
+  Badge,
+  Button,
+  SectionHeading,
+  Surface,
+} from "@/components/ui/Primitives";
 
 interface ProtocolEditorProps {
   availableFsrMembers: Member[];
@@ -78,8 +84,13 @@ export function ProtocolEditor({
     })
   );
 
+  const pointCount = React.useMemo(
+    () => sessionItems.reduce((total, item) => total + item.points.length, 0),
+    [sessionItems]
+  );
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-background text-slate-900 dark:text-foreground font-sans pb-20">
+    <div className="min-h-screen pb-20 text-foreground">
       <Header
         handlePasteFromClipboard={handlePasteFromClipboard}
         fileInputRef={fileInputRef}
@@ -90,7 +101,7 @@ export function ProtocolEditor({
         resetProtocol={resetProtocol}
       />
 
-      <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+      <main className="mx-auto grid max-w-[1640px] grid-cols-1 gap-6 px-4 py-5 sm:px-6 sm:py-7 lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-8 lg:px-8">
         <MetaSection
           fsrMembers={fsrMembers}
           setFsrMembers={setFsrMembers}
@@ -104,26 +115,41 @@ export function ProtocolEditor({
           availableAssocMembers={availableAssocMembers}
         />
 
-        {/* Meeting Content */}
-        <section>
-          <div className="flex justify-between items-end mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-foreground">
-              Sitzungsinhalte
-            </h2>
-            <button
-              onClick={addTopic}
-              className="flex items-center gap-1 text-sm text-indigo-600 dark:text-primary font-medium hover:text-indigo-800 dark:hover:text-indigo-300"
-            >
-              <Plus size={16} /> Neues Thema
-            </button>
-          </div>
+        <section className="min-w-0">
+          <Surface className="mb-5 overflow-hidden">
+            <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <SectionHeading
+                eyebrow="Arbeitsbereich"
+                title="Sitzungsinhalte"
+                description="Themen ordnen, Beschlüsse festhalten und das fertige Protokoll direkt weitergeben."
+              />
+              <Button onClick={addTopic} variant="primary" className="self-start sm:self-auto">
+                <Plus size={17} /> Neues Thema
+              </Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 border-t border-border bg-[color:var(--muted)]/45 px-5 py-3 sm:px-6">
+              <Badge tone={sessionItems.length ? "accent" : "neutral"}>
+                <ListChecks size={13} className="mr-1.5" />
+                {sessionItems.length} {sessionItems.length === 1 ? "Thema" : "Themen"}
+              </Badge>
+              <Badge>{pointCount} Punkte</Badge>
+              <span className="ml-auto hidden items-center gap-3 text-xs font-medium text-muted-foreground md:flex">
+                <span className="flex items-center gap-1">
+                  <AtSign size={13} /> Personen erwähnen
+                </span>
+                <span className="flex items-center gap-1">
+                  <Terminal size={13} /> Befehle einfügen
+                </span>
+              </span>
+            </div>
+          </Surface>
 
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="space-y-6">
+            <div className="space-y-4" aria-live="polite">
               <SortableContext
                 items={sessionItems.map((item) => item.id)}
                 strategy={verticalListSortingStrategy}
@@ -143,12 +169,20 @@ export function ProtocolEditor({
               </SortableContext>
 
               {sessionItems.length === 0 && (
-                <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-border text-slate-400 dark:text-muted-foreground">
-                  <p>
-                    Keine Themen vorhanden. Füge ein Thema hinzu oder importiere
-                    ein Protokoll.
+                <Surface className="border-dashed p-8 text-center sm:p-14">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.35rem] bg-accent text-accent-foreground">
+                    <FilePlus2 size={28} strokeWidth={1.8} />
+                  </div>
+                  <h3 className="mt-5 text-lg font-bold tracking-[-0.02em]">
+                    Bereit für die Sitzung
+                  </h3>
+                  <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-muted-foreground">
+                    Lege das erste Thema an oder importiere ein vorhandenes YAML-Protokoll über die Werkzeugleiste.
                   </p>
-                </div>
+                  <Button onClick={addTopic} variant="primary" className="mt-5">
+                    <Plus size={17} /> Erstes Thema anlegen
+                  </Button>
+                </Surface>
               )}
             </div>
           </DndContext>

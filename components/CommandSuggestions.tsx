@@ -31,10 +31,10 @@ export function CommandSuggestions({
       style={{ position, ...style }}
       className={
         className ??
-        "bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20"
+        "glass-popover materialize z-20 rounded-xl p-1"
       }
     >
-      <div className="py-1">
+      <div>
         {commands.map((command, index) => {
           const isActive = index === activeIndex;
           return (
@@ -45,18 +45,18 @@ export function CommandSuggestions({
                 event.preventDefault();
                 onPick(command);
               }}
-              className={`w-full px-3 py-2 text-left flex items-start gap-3 transition-colors ${
+              className={`focus-ring flex min-h-12 w-full items-start gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
                 isActive
-                  ? "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-200"
-                  : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-800"
+                  ? "bg-accent text-accent-foreground"
+                  : "text-secondary-foreground hover:bg-muted"
               }`}
             >
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-300">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <Terminal size={14} />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium">/{command.name}</span>
-                <span className="block text-xs text-slate-500 dark:text-muted-foreground">
+                <span className="block text-xs text-muted-foreground">
                   {command.description}
                 </span>
               </span>

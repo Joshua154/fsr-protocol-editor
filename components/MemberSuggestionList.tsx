@@ -35,14 +35,14 @@ export function MemberSuggestionList({
             e.preventDefault();
             onPick(member);
           }}
-          className={`w-full text-left px-3 py-2 text-md text-slate-700 dark:text-foreground hover:bg-indigo-50 dark:hover:bg-zinc-800 flex justify-between items-center ${
-            idx === activeIndex ? "bg-indigo-50 dark:bg-zinc-800" : ""
+          className={`focus-ring flex min-h-11 w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-secondary-foreground transition-colors hover:bg-muted ${
+            idx === activeIndex ? "bg-accent text-accent-foreground" : ""
           }`}
         >
           <div className="flex flex-col">
             <span>{member.name}</span>
             {member.aliases && member.aliases.length > 0 && (
-              <span className="text-sm text-slate-400 dark:text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {member.aliases.join(", ")}
               </span>
             )}

@@ -8,9 +8,9 @@ import {
   listErrorKey,
   type CommandArgumentFormErrors,
 } from "@/common/commandArguments";
+import { Button, FieldLabel } from "@/components/ui/Primitives";
 
-const fieldClassName =
-  "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-border dark:bg-zinc-950 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus:border-primary dark:focus:ring-indigo-950";
+const fieldClassName = "ui-input text-sm";
 
 type Props = {
   schema: ListCommandArgumentSchema;
@@ -62,27 +62,29 @@ export function CommandArgumentListInput({
   return (
     <div className="space-y-3">
       {errors[schema.name] && (
-        <span className="text-xs text-red-500">{errors[schema.name]}</span>
+        <span className="text-xs font-medium text-destructive" role="alert">{errors[schema.name]}</span>
       )}
 
       {items.map((item, itemIndex) => (
         <div
           key={itemIndex}
-          className="rounded-md border border-slate-200 p-3 dark:border-border"
+          className="rounded-xl border border-border bg-[color:var(--muted)]/35 p-3"
         >
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-muted-foreground">
+            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
               {itemLabel} {itemIndex + 1}
             </span>
             {canRemove && (
-              <button
+              <Button
                 type="button"
                 onClick={() => removeItem(itemIndex)}
-                className="text-slate-400 hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"
+                variant="quiet"
+                size="icon"
+                className="h-8 min-h-8 w-8 text-muted-foreground hover:bg-[var(--destructive-soft)] hover:text-destructive"
                 aria-label={`${itemLabel} entfernen`}
               >
                 <Trash2 size={14} />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -106,14 +108,16 @@ export function CommandArgumentListInput({
       ))}
 
       {canAdd && (
-        <button
+        <Button
           type="button"
           onClick={addItem}
-          className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+          variant="quiet"
+          size="sm"
+          className="text-primary"
         >
           <Plus size={14} />
           {addLabel}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -134,9 +138,7 @@ function ListField({
 }) {
   return (
     <label className="block space-y-1">
-      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-        {field.label}
-      </span>
+      <FieldLabel className="mb-0 text-xs">{field.label}</FieldLabel>
       <input
         ref={inputRef}
         type={getListFieldInputType(field)}
@@ -145,7 +147,7 @@ function ListField({
         placeholder={field.placeholder}
         className={fieldClassName}
       />
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-xs font-medium text-destructive" role="alert">{error}</span>}
     </label>
   );
 }

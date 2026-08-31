@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/Primitives";
 
 interface ModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const Modal = ({
   width = "md",
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = React.useId();
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -26,13 +28,21 @@ export const Modal = ({
     };
 
     if (isOpen) {
+      const previousOverflow = document.body.style.overflow;
+      const previousFocus = document.activeElement as HTMLElement | null;
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => modalRef.current?.focus());
+
+      return () => {
+        document.removeEventListener("keydown", handleEscape);
+        document.body.style.overflow = previousOverflow;
+        previousFocus?.focus();
+      };
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -46,25 +56,35 @@ export const Modal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <div
         ref={modalRef}
-        className={`bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full ${widthClasses[width]} transform transition-all animate-in zoom-in-95 duration-200 flex flex-col`}
+        tabIndex={-1}
+        className={`glass-popover materialize flex w-full ${widthClasses[width]} max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-[var(--radius-card)] outline-none`}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
       >
-        <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+        <div className="flex items-center justify-between gap-4 border-b border-border bg-[color:var(--muted)]/40 px-5 py-4">
+          <h3 id={titleId} className="text-lg font-bold tracking-[-0.02em] text-foreground">
             {title}
           </h3>
-          <button
+          <Button
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800"
+            variant="quiet"
+            size="icon"
+            aria-label="Dialog schließen"
+            className="-mr-2"
           >
-            <X size={20} />
-          </button>
+            <X size={18} />
+          </Button>
         </div>
-        <div className="p-6 overflow-y-auto max-h-[80vh]">{children}</div>
+        <div className="overflow-y-auto p-5 subtle-scrollbar sm:p-6">{children}</div>
       </div>
     </div>
   );

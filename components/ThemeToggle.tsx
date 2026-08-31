@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import * as React from "react";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/Primitives";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-  // Avoid hydration mismatch
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+  React.useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return (
-      <button className="p-2 rounded-lg text-slate-600 border border-transparent">
-         <span className="w-5 h-5 block" />
-      </button>
-    )
-  }
+  const isDark = mounted && resolvedTheme === "dark";
+  const label = isDark ? "Helles Erscheinungsbild" : "Dunkles Erscheinungsbild";
 
   return (
-    <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
-      aria-label="Toggle theme"
+    <Button
+      onClick={() => mounted && setTheme(isDark ? "light" : "dark")}
+      variant="quiet"
+      size="icon"
+      aria-label={label}
+      title={label}
+      disabled={!mounted}
     >
-      {theme === "dark" ? <Moon size={20} /> : <Sun size={20} />}
-    </button>
-  )
+      {mounted ? (
+        isDark ? <Moon size={17} /> : <Sun size={17} />
+      ) : (
+        <span className="h-[17px] w-[17px]" aria-hidden="true" />
+      )}
+    </Button>
+  );
 }

@@ -23,6 +23,7 @@ export const TagInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const [matches, setMatches] = useState<Member[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = React.useId();
 
   const canOpenSuggestions =
     isOpen && (maxSelections === -1 || selected.length < maxSelections);
@@ -62,25 +63,32 @@ export const TagInput = ({
 
   return (
     <div className="relative group">
-      <label className="block text-md font-medium text-slate-700 dark:text-muted-foreground mb-1">
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="mb-1.5 block text-sm font-semibold text-secondary-foreground"
+        >
+          {label}
+        </label>
+      )}
       <div
-        className="flex flex-wrap gap-2 p-2 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-11.5 cursor-text"
+        className="control-surface flex min-h-11 flex-wrap gap-1.5 rounded-xl p-1.5 transition-[border-color,box-shadow,background-color] duration-150 focus-within:border-primary focus-within:bg-[var(--card-strong)] focus-within:ring-4 focus-within:ring-[var(--ring)]"
         onClick={() => inputRef.current?.focus()}
       >
         {selected.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 px-2 py-1 text-md bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-100 rounded-md"
+            className="flex min-h-8 items-center gap-1 rounded-lg bg-accent px-2.5 py-1 text-sm font-semibold text-accent-foreground"
           >
             {tag}
             <button
+              type="button"
+              aria-label={`${tag} entfernen`}
               onClick={(e) => {
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer"
+              className="focus-ring -mr-1 rounded-md p-1 text-accent-foreground/70 transition-colors hover:bg-black/5 hover:text-accent-foreground dark:hover:bg-white/10"
             >
               <X size={14} />
             </button>
@@ -98,16 +106,17 @@ export const TagInput = ({
             setActiveIndex(0);
           }}
           onPick={(member) => addTag(member.name)}
-          className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto"
+          className="glass-popover materialize absolute left-0 top-full z-20 mt-2 max-h-56 w-full overflow-y-auto rounded-xl py-1 subtle-scrollbar"
           renderRight={() => (
             <Plus
               size={14}
-              className="text-slate-400 dark:text-muted-foreground"
+              className="text-muted-foreground"
             />
           )}
         />
-        <div className="relative flex-1 min-w-30">
+        <div className="relative min-w-28 flex-1">
           <input
+            id={inputId}
             ref={inputRef}
             type="text"
             value={input}
@@ -119,7 +128,7 @@ export const TagInput = ({
             onBlur={() => setTimeout(() => setIsOpen(false), 50)}
             disabled={maxSelections !== -1 && selected.length >= maxSelections}
             onKeyDown={handleKeyDown}
-            className="w-full bg-transparent outline-none text-md h-full py-1 text-slate-700 dark:text-foreground"
+            className="h-full min-h-8 w-full bg-transparent px-1.5 py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
             placeholder={selected.length === 0 ? "Namen auswählen..." : ""}
           />
         </div>
