@@ -71,7 +71,7 @@ export const SortableSessionItem = ({
   } = useSortable({ id: item.id });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
     zIndex: isDragging ? 30 : "auto",
     opacity: isDragging ? 0.78 : 1,
