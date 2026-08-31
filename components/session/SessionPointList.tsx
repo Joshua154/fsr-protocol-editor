@@ -42,7 +42,7 @@ export function SessionPointList({
               onChange={(event) =>
                 onChange(index, event.currentTarget, event.target.value)
               }
-              className="min-h-11 w-full resize-none rounded-lg border border-transparent bg-transparent px-1.5 py-2.5 text-sm leading-relaxed text-secondary-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-border focus:bg-[color:var(--input)] sm:text-[0.9375rem]"
+              className="min-h-11 w-full resize-none rounded-xl border border-transparent bg-transparent px-2 py-2.5 text-sm leading-relaxed text-secondary-foreground outline-none transition-colors placeholder:text-muted-foreground focus:text-foreground sm:text-[0.9375rem]"
               rows={
                 point == null || point === ""
                   ? 1
@@ -56,7 +56,7 @@ export function SessionPointList({
               onClick={() => onRemove(index)}
               variant="quiet"
               size="icon"
-              className="scale-95 text-muted-foreground opacity-50 hover:bg-[var(--destructive-soft)] hover:text-destructive group-hover/point:scale-100 group-hover/point:opacity-100 focus-visible:scale-100 focus-visible:opacity-100"
+              className="scale-95 text-muted-foreground opacity-60 hover:bg-[var(--destructive-soft)] hover:text-destructive sm:opacity-0 sm:group-hover/point:scale-100 sm:group-hover/point:opacity-100 sm:focus-visible:scale-100 sm:focus-visible:opacity-100"
               aria-label={`Punkt ${index + 1} löschen`}
               title="Punkt löschen"
             >
@@ -64,9 +64,20 @@ export function SessionPointList({
             </Button>
           </div>
         ))}
+
+        {points.length === 0 && (
+          <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+            Noch keine Punkte in diesem Thema.
+          </div>
+        )}
       </div>
 
-      <Button onClick={onAdd} variant="quiet" size="sm" className="mt-3 text-primary">
+      <Button
+        onClick={onAdd}
+        variant="quiet"
+        size="sm"
+        className="mt-3 w-full border border-dashed border-[var(--border-strong)] bg-[color:var(--muted)]/20 text-primary hover:border-primary hover:bg-accent hover:text-accent-foreground"
+      >
         <Plus size={15} /> Punkt hinzufügen
       </Button>
     </div>

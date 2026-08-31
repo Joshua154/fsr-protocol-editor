@@ -154,10 +154,11 @@ export function ProtocolEditor({
                 items={sessionItems.map((item) => item.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {sessionItems.map((item) => (
+                {sessionItems.map((item, index) => (
                   <SortableSessionItem
                     key={item.id}
                     item={item}
+                    position={index + 1}
                     memberSuggestions={memberSuggestions}
                     updateTopicTitle={updateTopicTitle}
                     removeTopic={removeTopic}

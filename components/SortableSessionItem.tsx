@@ -19,6 +19,7 @@ import { SessionPointList } from "@/components/session/SessionPointList";
 
 interface SortableSessionItemProps {
   item: SessionItem;
+  position: number;
   memberSuggestions: Member[];
   updateTopicTitle: (id: string, val: string) => void;
   removeTopic: (id: string) => void;
@@ -52,6 +53,7 @@ type CommandState = {
 
 export const SortableSessionItem = ({
   item,
+  position,
   memberSuggestions,
   updateTopicTitle,
   removeTopic,
@@ -72,7 +74,8 @@ export const SortableSessionItem = ({
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : "auto",
-    opacity: isDragging ? 0.88 : 1,
+    opacity: isDragging ? 0.78 : 1,
+    willChange: isDragging ? "transform" : undefined,
   };
 
   const topicRef = useRef<HTMLInputElement | null>(null);
@@ -410,10 +413,10 @@ export const SortableSessionItem = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`glass-surface group overflow-hidden rounded-[var(--radius-card)] transition-[box-shadow,border-color,opacity] ${
+      className={`glass-surface group relative isolate overflow-hidden rounded-[var(--radius-card)] transition-[box-shadow,border-color,opacity] duration-200 ${
         isDragging
-          ? "relative border-primary shadow-[0_28px_80px_var(--glass-shadow)]"
-          : "hover:border-[var(--border-strong)]"
+          ? "border-primary shadow-[0_28px_80px_var(--glass-shadow)]"
+          : "hover:border-[var(--border-strong)] hover:shadow-[0_24px_64px_var(--glass-shadow)]"
       }`}
     >
       <MemberSuggestions
@@ -481,6 +484,8 @@ export const SortableSessionItem = ({
 
       <SessionTopicHeader
         value={item.topic}
+        position={position}
+        pointCount={item.points.length}
         topicRef={topicRef}
         dragHandleProps={{ ...attributes, ...listeners }}
         onChange={(element, value) => {

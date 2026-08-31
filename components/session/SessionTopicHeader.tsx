@@ -1,9 +1,11 @@
 import React from "react";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, ListChecks, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Primitives";
 
 type Props = {
   value: string;
+  position: number;
+  pointCount: number;
   topicRef: React.RefObject<HTMLInputElement | null>;
   dragHandleProps: React.ButtonHTMLAttributes<HTMLButtonElement>;
   onChange: (element: HTMLInputElement, value: string) => void;
@@ -14,6 +16,8 @@ type Props = {
 
 export function SessionTopicHeader({
   value,
+  position,
+  pointCount,
   topicRef,
   dragHandleProps,
   onChange,
@@ -26,11 +30,11 @@ export function SessionTopicHeader({
       <button
         type="button"
         {...dragHandleProps}
-        className="focus-ring flex h-10 w-8 shrink-0 touch-none items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-primary active:cursor-grabbing"
+        className="focus-ring flex h-11 w-9 shrink-0 touch-none cursor-grab items-center justify-center rounded-xl border border-border bg-[color:var(--card-strong)]/55 text-muted-foreground shadow-sm transition-[color,background-color,border-color,transform] hover:border-[var(--border-strong)] hover:bg-[var(--card-strong)] hover:text-primary active:scale-95 active:cursor-grabbing"
         aria-label="Thema verschieben"
         title="Ziehen zum Sortieren"
       >
-        <GripVertical size={19} />
+        <GripVertical size={18} />
       </button>
 
       <input
@@ -48,7 +52,7 @@ export function SessionTopicHeader({
         onClick={onRemove}
         variant="quiet"
         size="icon"
-        className="shrink-0 text-muted-foreground hover:bg-[var(--destructive-soft)] hover:text-destructive"
+        className="shrink-0 text-muted-foreground sm:opacity-60 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 hover:bg-[var(--destructive-soft)] hover:text-destructive"
         aria-label="Thema löschen"
         title="Thema löschen"
       >
