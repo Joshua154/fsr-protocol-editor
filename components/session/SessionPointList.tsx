@@ -33,7 +33,7 @@ export function SessionPointList({
             key={index}
             className="group/point grid grid-cols-[1rem_minmax(0,1fr)_2.5rem] items-start gap-2 rounded-xl transition-colors hover:bg-[color:var(--muted)]/45 sm:gap-3"
           >
-            <span className="mt-[1.15rem] h-1.5 w-1.5 justify-self-center rounded-full bg-primary shadow-[0_0_0_4px_var(--ring)]" />
+            <span className="mt-[1.25rem] h-0.75 w-4 justify-self-center rounded-full bg-primary shadow-[0_0_0_2px_var(--ring)]" />
             <textarea
               ref={(element) => {
                 pointRefs.current[index] = element;
