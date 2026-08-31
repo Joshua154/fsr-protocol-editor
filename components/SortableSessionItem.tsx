@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { GripVertical, Trash2, Plus } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Member, SessionItem } from "@/common/types";
@@ -15,9 +14,12 @@ import { CommandSuggestions } from "@/components/CommandSuggestions";
 import { MemberSuggestions } from "@/components/MemberSuggestions";
 import { Modal } from "@/components/Modal";
 import { useSuggestionNavigation } from "@/hooks/useSuggestionNavigation";
+import { SessionTopicHeader } from "@/components/session/SessionTopicHeader";
+import { SessionPointList } from "@/components/session/SessionPointList";
 
 interface SortableSessionItemProps {
   item: SessionItem;
+  position: number;
   memberSuggestions: Member[];
   updateTopicTitle: (id: string, val: string) => void;
   removeTopic: (id: string) => void;
@@ -51,6 +53,7 @@ type CommandState = {
 
 export const SortableSessionItem = ({
   item,
+  position,
   memberSuggestions,
   updateTopicTitle,
   removeTopic,
@@ -68,10 +71,11 @@ export const SortableSessionItem = ({
   } = useSortable({ id: item.id });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : "auto", // Bring dragged item to front
-    opacity: isDragging ? 0.9 : 1,
+    zIndex: isDragging ? 30 : "auto",
+    opacity: isDragging ? 0.78 : 1,
+    willChange: isDragging ? "transform" : undefined,
   };
 
   const topicRef = useRef<HTMLInputElement | null>(null);
@@ -407,10 +411,13 @@ export const SortableSessionItem = ({
 
   return (
     <div
+      id={`session-topic-${item.id}`}
       ref={setNodeRef}
       style={style}
-      className={`bg-white dark:bg-card rounded-xl shadow-md border overflow-hidden group transition-shadow ${
-        isDragging ? "border-indigo-500 shadow-xl relative" : "border-slate-200 dark:border-border dark:shadow-none"
+      className={`glass-surface group relative isolate scroll-mt-28 overflow-hidden rounded-[var(--radius-card)] transition-[box-shadow,border-color,opacity] duration-200 ${
+        isDragging
+          ? "border-primary shadow-[0_28px_80px_var(--glass-shadow)]"
+          : "hover:border-[var(--border-strong)] hover:shadow-[0_24px_64px_var(--glass-shadow)]"
       }`}
     >
       <MemberSuggestions
@@ -438,7 +445,7 @@ export const SortableSessionItem = ({
               }
             : undefined
         }
-        className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
+        className="glass-popover materialize z-[60] max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
       />
 
       <CommandSuggestions
@@ -457,7 +464,7 @@ export const SortableSessionItem = ({
               }
             : undefined
         }
-        className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto"
+        className="glass-popover materialize z-[60] max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
       />
 
       {command.selectedCommand && commandRequiresArguments(command.selectedCommand) && (
@@ -476,89 +483,36 @@ export const SortableSessionItem = ({
         </Modal>
       )}
 
-      {/* Topic Header */}
-      <div className="bg-slate-50 dark:bg-zinc-900 p-4 border-b border-slate-100 dark:border-border flex gap-4 items-center">
-        {/* Drag Handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing text-slate-400 dark:text-muted-foreground hover:text-indigo-600 dark:hover:text-primary p-1"
-          title="Ziehen zum Sortieren"
-        >
-          <GripVertical size={20} />
-        </div>
-        
-        <input
-          ref={topicRef}
-          type="text"
-          value={item.topic}
-          onChange={(e) => {
-            updateTopicTitle(item.id, e.target.value);
-            updateMentionFromInput({ type: "topic" }, e.currentTarget, e.target.value);
-            updateCommandFromInput({ type: "topic" }, e.currentTarget, e.target.value);
-          }}
-          className="flex-1 bg-transparent text-lg font-semibold text-slate-800 dark:text-foreground placeholder-slate-400 dark:placeholder-muted-foreground outline-none focus:underline decoration-indigo-300 dark:decoration-indigo-700 underline-offset-4"
-          placeholder="Thema Titel..."
-          onKeyDown={onEditorKeyDown} // Stop DND from interfering with typing
-          onBlur={() => setTimeout(() => closeMention(), 80)}
-        />
-        <button
-          onClick={() => removeTopic(item.id)}
-          className="text-slate-400 dark:text-muted-foreground hover:text-red-500 dark:hover:text-red-400 transition-colors p-2"
-          title="Thema löschen"
-        >
-          <Trash2 size={18} />
-        </button>
-      </div>
+      <SessionTopicHeader
+        value={item.topic}
+        position={position}
+        pointCount={item.points.length}
+        topicRef={topicRef}
+        dragHandleProps={{ ...attributes, ...listeners }}
+        onChange={(element, value) => {
+          updateTopicTitle(item.id, value);
+          updateMentionFromInput({ type: "topic" }, element, value);
+          updateCommandFromInput({ type: "topic" }, element, value);
+        }}
+        onKeyDown={onEditorKeyDown}
+        onBlur={() => setTimeout(() => closeMention(), 80)}
+        onRemove={() => removeTopic(item.id)}
+      />
 
-      {/* Bullet Points */}
-      <div className="p-4 space-y-3">
-        {item.points.map((point, idx) => (
-          <div key={idx} className="flex gap-3 items-start group/point">
-            <div className="mt-3.5 w-1.5 h-1.5 bg-indigo-500 rounded-full shrink-0"></div>
-            <textarea
-              ref={(el) => {
-                pointRefs.current[idx] = el;
-              }}
-              value={point}
-              onChange={(e) => {
-                updatePoint(item.id, idx, e.target.value);
-                updateMentionFromInput(
-                  { type: "point", idx },
-                  e.currentTarget,
-                  e.target.value
-                );
-                updateCommandFromInput(
-                  { type: "point", idx },
-                  e.currentTarget,
-                  e.target.value
-                );
-              }}
-              className="flex-1 bg-transparent resize-none border-b border-transparent focus:border-indigo-200 dark:focus:border-primary outline-none py-1 text-slate-600 dark:text-foreground leading-relaxed"
-              rows={
-                point == null || point === ""
-                  ? 1
-                  : Math.max(1, Math.ceil(point.length / 80))
-              }
-              placeholder="Inhalt des Tagesordnungspunkts..."
-              onKeyDown={onEditorKeyDown}
-              onBlur={() => setTimeout(() => closeMention(), 80)}
-            />
-            <button
-              onClick={() => removePoint(item.id, idx)}
-              className="opacity-0 group-hover/point:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-400 dark:hover:text-red-400 transition-all p-1"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addPoint(item.id)}
-          className="ml-5 text-md text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 mt-2"
-        >
-          <Plus size={14} /> Punkt hinzufügen
-        </button>
-      </div>
+      <SessionPointList
+        topicId={item.id}
+        points={item.points}
+        pointRefs={pointRefs}
+        onChange={(idx, element, value) => {
+          updatePoint(item.id, idx, value);
+          updateMentionFromInput({ type: "point", idx }, element, value);
+          updateCommandFromInput({ type: "point", idx }, element, value);
+        }}
+        onKeyDown={onEditorKeyDown}
+        onBlur={() => setTimeout(() => closeMention(), 80)}
+        onAdd={() => addPoint(item.id)}
+        onRemove={(idx) => removePoint(item.id, idx)}
+      />
     </div>
   );
 };

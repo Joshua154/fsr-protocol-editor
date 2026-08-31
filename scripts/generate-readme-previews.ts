@@ -109,20 +109,8 @@ async function screenshot(page: Page, outPath: string) {
     await page.screenshot({ path: outPath, fullPage: true });
 }
 
-async function waitForDialog(page: Page) {
-    await page
-        .locator('[role="dialog"]')
-        .first()
-        .waitFor({ state: "visible", timeout: 5000 });
-}
-
 async function openMemberSuggestions(page: Page) {
-    const tagInput = page
-        .locator("div")
-        .filter({ has: page.locator('label:has-text("FSR Mitglieder")') })
-        .first();
-
-    const input = tagInput.locator('input[type="text"]').first();
+    const input = page.getByRole("textbox", { name: "Gewählte Mitglieder" });
     await input.click();
     await input.fill("a");
     await page.waitForTimeout(250);

@@ -13,6 +13,7 @@ import type {
   ScalarCommandArgumentSchema,
 } from "@/common/sessionCommands";
 import { CommandArgumentListInput } from "@/components/CommandArgumentListInput";
+import { Badge, Button, FieldLabel } from "@/components/ui/Primitives";
 
 type Props = {
   command: RegisteredSessionCommand;
@@ -20,8 +21,7 @@ type Props = {
   onCancel: () => void;
 };
 
-const fieldClassName =
-  "w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-border dark:bg-zinc-950 dark:text-foreground dark:placeholder:text-muted-foreground dark:focus:border-primary dark:focus:ring-indigo-950";
+const fieldClassName = "ui-input text-sm";
 
 export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
   const initialState = useMemo(() => createInitialFormState(command), [command]);
@@ -53,12 +53,10 @@ export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
   const firstFocusableArgumentName = command.arguments[0]?.name ?? null;
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div>
-        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-          /{command.name}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-muted-foreground">
+    <form onSubmit={submit} className="space-y-5">
+      <div className="rounded-xl bg-accent p-4">
+        <Badge tone="accent">/{command.name}</Badge>
+        <p className="mt-2 text-sm leading-relaxed text-accent-foreground">
           {command.description}
         </p>
       </div>
@@ -70,11 +68,9 @@ export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
 
             return (
               <div key={argument.name} className="block space-y-1.5">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {argument.label}
-                </span>
+                <FieldLabel>{argument.label}</FieldLabel>
                 {argument.description && (
-                  <span className="block text-xs text-slate-500 dark:text-muted-foreground">
+                  <span className="block text-xs leading-relaxed text-muted-foreground">
                     {argument.description}
                   </span>
                 )}
@@ -131,19 +127,19 @@ export function CommandArgumentForm({ command, onSubmit, onCancel }: Props) {
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
-          className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-zinc-800"
+          variant="quiet"
         >
           Abbrechen
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-primary dark:text-primary-foreground dark:hover:bg-indigo-400"
+          variant="primary"
         >
           Einfügen
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -164,11 +160,9 @@ function ScalarField({
 }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {schema.label}
-      </span>
+      <FieldLabel className="mb-0">{schema.label}</FieldLabel>
       {schema.description && (
-        <span className="block text-xs text-slate-500 dark:text-muted-foreground">
+        <span className="block text-xs leading-relaxed text-muted-foreground">
           {schema.description}
         </span>
       )}
@@ -195,7 +189,7 @@ function ScalarField({
           className={fieldClassName}
         />
       )}
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-xs font-medium text-destructive" role="alert">{error}</span>}
     </label>
   );
 }

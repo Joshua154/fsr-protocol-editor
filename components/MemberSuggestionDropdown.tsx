@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Member } from "@/common/types";
 import { MemberSuggestionList } from "@/components/MemberSuggestionList";
 
@@ -27,13 +28,13 @@ export function MemberSuggestionDropdown({
 }: Props) {
   if (!isOpen || members.length === 0) return null;
 
-  return (
+  const dropdown = (
     <div
       ref={containerRef}
       style={{ position, ...style }}
       className={
         className ??
-        "bg-white dark:bg-zinc-900 border border-slate-200 dark:border-border rounded-lg shadow-lg z-20"
+        "glass-popover materialize z-20 rounded-xl p-1"
       }
     >
       <MemberSuggestionList
@@ -44,4 +45,10 @@ export function MemberSuggestionDropdown({
       />
     </div>
   );
+
+  if (position === "fixed" && typeof document !== "undefined") {
+    return createPortal(dropdown, document.body);
+  }
+
+  return dropdown;
 }

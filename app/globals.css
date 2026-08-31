@@ -1,132 +1,304 @@
 @import "tailwindcss";
 
-/* @plugin "tailwindcss-animate"; */
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* --- Light Mode (Indigo/Slate) --- */
-  --background: #ffffff;
-  --foreground: #0f172a; /* Slate 900 */
-
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-
-  /* Indigo 600 */
-  --primary: #4f46e5;
+  color-scheme: light;
+  --background: #f2f5f9;
+  --foreground: #172033;
+  --card: rgba(255, 255, 255, 0.72);
+  --card-strong: rgba(255, 255, 255, 0.92);
+  --card-foreground: #172033;
+  --popover: #fbfcff;
+  --popover-foreground: #172033;
+  --primary: #3568e8;
+  --primary-strong: #2454ca;
   --primary-foreground: #ffffff;
-
-  /* Slate 100 */
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-
-  /* Slate 100 */
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b; /* Slate 500 */
-
-  /* Slate 100 */
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-
-  /* Red 500 */
-  --destructive: #ef4444;
+  --secondary: rgba(255, 255, 255, 0.58);
+  --secondary-foreground: #344158;
+  --muted: rgba(231, 236, 244, 0.72);
+  --muted-foreground: #68758a;
+  --accent: rgba(222, 232, 255, 0.76);
+  --accent-foreground: #2454ca;
+  --destructive: #d13f45;
   --destructive-foreground: #ffffff;
-
-  /* Slate 200 */
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  
-  /* Indigo 600 */
-  --ring: #4f46e5;
-
-  --radius: 0.5rem;
+  --destructive-soft: rgba(254, 226, 226, 0.76);
+  --success: #16845b;
+  --success-soft: rgba(209, 250, 229, 0.72);
+  --warning: #a75f08;
+  --warning-soft: rgba(254, 243, 199, 0.76);
+  --border: rgba(103, 120, 145, 0.16);
+  --border-strong: rgba(103, 120, 145, 0.26);
+  --input: rgba(255, 255, 255, 0.68);
+  --ring: rgba(53, 104, 232, 0.24);
+  --glass-border: rgba(255, 255, 255, 0.76);
+  --glass-highlight: rgba(255, 255, 255, 0.82);
+  --glass-shadow: rgba(33, 48, 76, 0.09);
+  --primary-glow: rgba(128, 171, 255, 0.24);
+  --secondary-glow: rgba(182, 225, 215, 0.2);
+  --radius-control: 0.75rem;
+  --radius-card: 1.5rem;
 }
 
-/* Dark Mode Override */
 .dark {
-  /* --- Dark Mode (Real Black Base) --- */
-  --background: #000000;
-  --foreground: #ededed;
-
-  --card: #000000;
-  --card-foreground: #ededed;
-
-  --popover: #000000;
-  --popover-foreground: #ededed;
-
-  /* Indigo 400 */
-  --primary: #818cf8;
-  --primary-foreground: #ffffff;
-
-  /* Zinc 900 */
-  --secondary: #18181b;
-  --secondary-foreground: #ededed;
-
-  /* Zinc 900 */
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa; /* Zinc 400 */
-
-  /* Zinc 900 */
-  --accent: #18181b;
-  --accent-foreground: #ededed;
-
-  /* Red 900 */
-  --destructive: #7f1d1d;
-  --destructive-foreground: #ededed;
-
-  /* Zinc 800 */
-  --border: #27272a;
-  --input: #27272a;
-  
-  /* Indigo 500 */
-  --ring: #6366f1;
+  color-scheme: dark;
+  --background: #0b111c;
+  --foreground: #e8edf5;
+  --card: rgba(22, 31, 45, 0.76);
+  --card-strong: rgba(27, 38, 54, 0.94);
+  --card-foreground: #e8edf5;
+  --popover: #192333;
+  --popover-foreground: #e8edf5;
+  --primary: #7da2ff;
+  --primary-strong: #a7beff;
+  --primary-foreground: #0d1b36;
+  --secondary: rgba(30, 42, 59, 0.72);
+  --secondary-foreground: #dbe4f2;
+  --muted: rgba(30, 42, 59, 0.66);
+  --muted-foreground: #9baac0;
+  --accent: rgba(63, 91, 153, 0.34);
+  --accent-foreground: #b9ccff;
+  --destructive: #ff8589;
+  --destructive-foreground: #34070a;
+  --destructive-soft: rgba(127, 29, 29, 0.34);
+  --success: #71d5aa;
+  --success-soft: rgba(6, 78, 59, 0.35);
+  --warning: #f0b85c;
+  --warning-soft: rgba(120, 53, 15, 0.32);
+  --border: rgba(151, 169, 195, 0.18);
+  --border-strong: rgba(151, 169, 195, 0.3);
+  --input: rgba(12, 20, 32, 0.56);
+  --ring: rgba(125, 162, 255, 0.28);
+  --glass-border: rgba(170, 190, 220, 0.15);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-shadow: rgba(0, 0, 0, 0.34);
+  --primary-glow: rgba(48, 91, 180, 0.2);
+  --secondary-glow: rgba(38, 116, 103, 0.13);
 }
 
-/* Map CSS variables to Tailwind Utility Classes */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-  
-  /* Fonts (Optional/Example) */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --radius-lg: var(--radius-control);
+  --radius-md: calc(var(--radius-control) - 0.125rem);
+  --radius-sm: calc(var(--radius-control) - 0.25rem);
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
-/* Base styles */
-body {
+* {
+  border-color: var(--border);
+}
+
+html {
+  min-width: 20rem;
+  scroll-behavior: smooth;
   background: var(--background);
+  font: 100%/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-optical-sizing: auto;
+}
+
+body {
+  min-height: 100vh;
   color: var(--foreground);
-  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at 8% -4%, var(--primary-glow), transparent 31rem),
+    radial-gradient(circle at 92% 4%, var(--secondary-glow), transparent 29rem),
+    var(--background);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: color 220ms ease, background-color 220ms ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+::selection {
+  color: var(--foreground);
+  background: var(--accent);
+}
+
+.glass-surface {
+  border: 1px solid var(--glass-border);
+  background: var(--card);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 20px 60px var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+.glass-popover {
+  border: 1px solid var(--glass-border);
+  background: var(--popover);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 18px 48px var(--glass-shadow);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+
+.control-surface {
+  border: 1px solid var(--border);
+  background: var(--input);
+  box-shadow: 0 1px 2px rgba(22, 32, 51, 0.04);
+}
+
+.focus-ring:focus-visible,
+.ui-input:focus-visible,
+.ui-button:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+.ui-input {
+  min-height: 2.75rem;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--input);
+  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  box-shadow: 0 1px 2px rgba(22, 32, 51, 0.04);
+  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.ui-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.ui-input:focus {
+  border-color: var(--primary);
+  background: var(--card-strong);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+.ui-button {
+  min-height: 2.5rem;
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  transition: transform 100ms ease-out, color 140ms ease, background-color 140ms ease,
+    border-color 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ui-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.materialize {
+  animation: materialize 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: var(--material-origin, center top);
+}
+
+@keyframes materialize {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.subtle-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .ui-button:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-surface,
+  .glass-popover {
+    background: var(--card-strong);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .glass-surface,
+  .glass-popover,
+  .control-surface,
+  .ui-input {
+    border-color: currentColor;
+    background: var(--card-strong);
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  body {
+    color: #111827;
+    background: #ffffff;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .glass-surface {
+    border: 0;
+    background: #ffffff;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
 }
