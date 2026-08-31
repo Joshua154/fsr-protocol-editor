@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Primitives";
 
@@ -46,7 +47,7 @@ export const Modal = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === "undefined") return null;
 
   const widthClasses = {
     sm: "max-w-sm",
@@ -55,9 +56,9 @@ export const Modal = ({
     xl: "max-w-xl",
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -86,6 +87,7 @@ export const Modal = ({
         </div>
         <div className="overflow-y-auto p-5 subtle-scrollbar sm:p-6">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

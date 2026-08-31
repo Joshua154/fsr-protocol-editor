@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Terminal } from "lucide-react";
 import type { RegisteredSessionCommand } from "@/common/sessionCommands";
 
@@ -25,7 +26,7 @@ export function CommandSuggestions({
 }: Props) {
   if (!isOpen || commands.length === 0) return null;
 
-  return (
+  const palette = (
     <div
       ref={containerRef}
       style={{ position, ...style }}
@@ -66,4 +67,10 @@ export function CommandSuggestions({
       </div>
     </div>
   );
+
+  if (position === "fixed" && typeof document !== "undefined") {
+    return createPortal(palette, document.body);
+  }
+
+  return palette;
 }

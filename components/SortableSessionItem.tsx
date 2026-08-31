@@ -73,7 +73,7 @@ export const SortableSessionItem = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : "auto",
+    zIndex: isDragging ? 30 : "auto",
     opacity: isDragging ? 0.78 : 1,
     willChange: isDragging ? "transform" : undefined,
   };
@@ -445,7 +445,7 @@ export const SortableSessionItem = ({
               }
             : undefined
         }
-        className="glass-popover materialize z-50 max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
+        className="glass-popover materialize z-[60] max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
       />
 
       <CommandSuggestions
@@ -464,7 +464,7 @@ export const SortableSessionItem = ({
               }
             : undefined
         }
-        className="glass-popover materialize z-50 max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
+        className="glass-popover materialize z-[60] max-h-56 overflow-y-auto rounded-xl p-1 subtle-scrollbar"
       />
 
       {command.selectedCommand && commandRequiresArguments(command.selectedCommand) && (

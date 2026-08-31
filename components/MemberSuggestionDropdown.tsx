@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { Member } from "@/common/types";
 import { MemberSuggestionList } from "@/components/MemberSuggestionList";
 
@@ -27,7 +28,7 @@ export function MemberSuggestionDropdown({
 }: Props) {
   if (!isOpen || members.length === 0) return null;
 
-  return (
+  const dropdown = (
     <div
       ref={containerRef}
       style={{ position, ...style }}
@@ -44,4 +45,10 @@ export function MemberSuggestionDropdown({
       />
     </div>
   );
+
+  if (position === "fixed" && typeof document !== "undefined") {
+    return createPortal(dropdown, document.body);
+  }
+
+  return dropdown;
 }
