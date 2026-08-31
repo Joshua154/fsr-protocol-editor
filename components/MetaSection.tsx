@@ -31,7 +31,7 @@ interface MetaSectionProps {
 
 const getCurrentTimeString = (): string => {
   const now = new Date();
-  return [now.getHours(), now.getMinutes()]
+  return [now.getHours(), now.getMinutes(), now.getSeconds()]
     .map((part) => part.toString().padStart(2, "0"))
     .join(":");
 };
@@ -100,118 +100,126 @@ export const MetaSection = ({
   setMeta,
 }: MetaSectionProps) => {
   return (
-    <aside className="space-y-4 lg:sticky lg:top-[5.75rem] lg:self-start">
+    <section className="space-y-4" aria-labelledby="session-data-heading">
       <div className="px-1 pb-1">
-        <Eyebrow>Vorbereitung</Eyebrow>
-        <h2 className="mt-1 text-xl font-bold tracking-[-0.03em]">Sitzungsdaten</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Alle Angaben werden automatisch in diesem Browser gesichert.
-        </p>
+        <h2
+          id="session-data-heading"
+          className="mt-1 text-xl font-bold tracking-[-0.03em]"
+        >
+          Sitzungsdaten
+        </h2>
       </div>
 
-      <Surface className="p-5">
-        <PanelTitle
-          icon={<Users size={17} />}
-          title="Anwesenheit"
-          description="Mitglieder, Gäste und Protokollführung"
-        />
-        <div className="space-y-4">
-          <TagInput
-            label="Gewählte Mitglieder"
-            selected={fsrMembers}
-            setSelected={setFsrMembers}
-            suggestions={availableFsrMembers}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Surface className="p-5 sm:p-6">
+          <PanelTitle
+            icon={<Users size={17} />}
+            title="Anwesenheit"
+            description="Mitglieder, Gäste und Protokollführung"
           />
-          <TagInput
-            label="Assoziierte & Gäste"
-            selected={guests}
-            setSelected={setGuests}
-            suggestions={availableAssocMembers}
-          />
-          <TagInput
-            label="Protokollant:in"
-            selected={protocolant}
-            setSelected={setProtocolant}
-            suggestions={availableFsrMembers}
-            maxSelections={1}
-          />
-        </div>
-      </Surface>
-
-      <Surface className="p-5">
-        <PanelTitle
-          icon={<CalendarDays size={17} />}
-          title="Termin & Ort"
-          description="Zeitlicher und räumlicher Rahmen"
-        />
-        <div className="space-y-4">
-          <label className="block">
-            <FieldLabel>Datum</FieldLabel>
-            <input
-              type="date"
-              value={meta.Date}
-              onChange={(event) => setMeta({ ...meta, Date: event.target.value })}
-              className="ui-input font-mono text-sm"
+          <div className="space-y-4">
+            <TagInput
+              label="Gewählte Mitglieder"
+              selected={fsrMembers}
+              setSelected={setFsrMembers}
+              suggestions={availableFsrMembers}
             />
-          </label>
+            <TagInput
+              label="Assoziierte & Gäste"
+              selected={guests}
+              setSelected={setGuests}
+              suggestions={availableAssocMembers}
+            />
+            <TagInput
+              label="Protokollant:in"
+              selected={protocolant}
+              setSelected={setProtocolant}
+              suggestions={availableFsrMembers}
+              maxSelections={1}
+            />
+          </div>
+        </Surface>
 
-          <div className="grid grid-cols-2 gap-3">
-            {(["Start", "Ende"] as const).map((field) => (
-              <label className="block" key={field}>
-                <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-secondary-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <Clock3 size={13} />
-                    {field}
+        <Surface className="p-5 sm:p-6">
+          <PanelTitle
+            icon={<CalendarDays size={17} />}
+            title="Termin & Ort"
+            description="Zeitliche und räumliche Angaben"
+          />
+          <div className="space-y-4">
+            <label className="block">
+              <FieldLabel>Datum</FieldLabel>
+              <input
+                type="date"
+                value={meta.Date}
+                onChange={(event) => setMeta({ ...meta, Date: event.target.value })}
+                className="ui-input font-mono text-sm"
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {(["Start", "Ende"] as const).map((field) => (
+                <div className="block" key={field}>
+                  <span className="mb-1.5 flex items-center justify-between gap-2 text-sm font-semibold text-secondary-foreground">
+                    <label
+                      htmlFor={`session-${field.toLowerCase()}`}
+                      className="flex items-center gap-1.5"
+                    >
+                      <Clock3 size={13} />
+                      {field}
+                    </label>
+                    <Button
+                      size="sm"
+                      variant="quiet"
+                      className="min-h-0 px-1 py-0 text-xs text-primary"
+                      onClick={() =>
+                        setMeta({ ...meta, [field]: getCurrentTimeString() })
+                      }
+                    >
+                      jetzt
+                    </Button>
                   </span>
-                  <Button
-                    size="sm"
-                    variant="quiet"
-                    className="min-h-0 px-1 py-0 text-xs text-primary"
-                    onClick={() =>
-                      setMeta({ ...meta, [field]: getCurrentTimeString() })
+                  <input
+                    id={`session-${field.toLowerCase()}`}
+                    type="time"
+                    step={1}
+                    value={meta[field]}
+                    onChange={(event) =>
+                      setMeta({ ...meta, [field]: event.target.value })
                     }
-                  >
-                    jetzt
-                  </Button>
-                </span>
-                <input
-                  type="time"
-                  value={meta[field]}
-                  onChange={(event) =>
-                    setMeta({ ...meta, [field]: event.target.value })
-                  }
-                  className="ui-input font-mono text-sm"
-                />
-              </label>
-            ))}
-          </div>
+                    className="ui-input font-mono text-sm"
+                  />
+                </div>
+              ))}
+            </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="relative">
-              <div className="pointer-events-none absolute right-3 top-[2.55rem] text-muted-foreground">
-                <MapPin size={15} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="relative">
+                <div className="pointer-events-none absolute right-3 top-[2.55rem] text-muted-foreground">
+                  <MapPin size={15} />
+                </div>
+                <TextField
+                  label="Ort"
+                  value={meta.Location || ""}
+                  onChange={(Location) => setMeta({ ...meta, Location })}
+                  placeholder="z. B. Institut"
+                />
               </div>
-              <TextField
-                label="Ort"
-                value={meta.Location || ""}
-                onChange={(Location) => setMeta({ ...meta, Location })}
-                placeholder="z. B. Institut"
-              />
-            </div>
-            <div className="relative">
-              <div className="pointer-events-none absolute right-3 top-[2.55rem] text-muted-foreground">
-                <PenLine size={15} />
+              <div className="relative">
+                <div className="pointer-events-none absolute right-3 top-[2.55rem] text-muted-foreground">
+                  <PenLine size={15} />
+                </div>
+                <TextField
+                  label="Raum"
+                  value={meta.Room || ""}
+                  onChange={(Room) => setMeta({ ...meta, Room })}
+                  placeholder="z. B. 0.70"
+                />
               </div>
-              <TextField
-                label="Raum"
-                value={meta.Room || ""}
-                onChange={(Room) => setMeta({ ...meta, Room })}
-                placeholder="z. B. 0.70"
-              />
             </div>
           </div>
-        </div>
-      </Surface>
-    </aside>
+        </Surface>
+      </div>
+    </section>
   );
 };

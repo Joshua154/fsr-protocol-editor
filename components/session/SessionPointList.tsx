@@ -3,6 +3,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Primitives";
 
 type Props = {
+  topicId: string;
   points: string[];
   pointRefs: React.MutableRefObject<(HTMLTextAreaElement | null)[]>;
   onChange: (
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function SessionPointList({
+  topicId,
   points,
   pointRefs,
   onChange,
@@ -31,7 +33,8 @@ export function SessionPointList({
         {points.map((point, index) => (
           <div
             key={index}
-            className="group/point grid grid-cols-[1rem_minmax(0,1fr)_2.5rem] items-start gap-2 rounded-xl transition-colors hover:bg-[color:var(--muted)]/45 sm:gap-3"
+            id={`session-point-${topicId}-${index}`}
+            className="group/point grid scroll-mt-28 grid-cols-[1rem_minmax(0,1fr)_2.5rem] items-start gap-2 rounded-xl transition-colors hover:bg-[color:var(--muted)]/45 sm:gap-3"
           >
             <span className="mt-[1.15rem] h-1.5 w-1.5 justify-self-center rounded-full bg-primary shadow-[0_0_0_4px_var(--ring)]" />
             {/* <span className="mt-[1.25rem] h-0.75 w-4 justify-self-center rounded-full bg-primary shadow-[0_0_0_2px_var(--ring)]" /> dash */}
@@ -49,7 +52,7 @@ export function SessionPointList({
                   ? 1
                   : Math.max(1, Math.ceil(point.length / 80))
               }
-              placeholder="Diskussion, Ergebnis oder Aufgabe festhalten …"
+              placeholder="Punkt notieren ..."
               onKeyDown={onKeyDown}
               onBlur={onBlur}
             />

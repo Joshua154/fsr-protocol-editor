@@ -411,9 +411,10 @@ export const SortableSessionItem = ({
 
   return (
     <div
+      id={`session-topic-${item.id}`}
       ref={setNodeRef}
       style={style}
-      className={`glass-surface group relative isolate overflow-hidden rounded-[var(--radius-card)] transition-[box-shadow,border-color,opacity] duration-200 ${
+      className={`glass-surface group relative isolate scroll-mt-28 overflow-hidden rounded-[var(--radius-card)] transition-[box-shadow,border-color,opacity] duration-200 ${
         isDragging
           ? "border-primary shadow-[0_28px_80px_var(--glass-shadow)]"
           : "hover:border-[var(--border-strong)] hover:shadow-[0_24px_64px_var(--glass-shadow)]"
@@ -499,6 +500,7 @@ export const SortableSessionItem = ({
       />
 
       <SessionPointList
+        topicId={item.id}
         points={item.points}
         pointRefs={pointRefs}
         onChange={(idx, element, value) => {

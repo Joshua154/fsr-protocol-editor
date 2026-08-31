@@ -43,7 +43,7 @@ export function SessionTopicHeader({
         value={value}
         onChange={(event) => onChange(event.currentTarget, event.target.value)}
         className="focus-ring min-h-11 min-w-0 flex-1 rounded-xl border border-transparent bg-transparent px-2 text-base font-bold tracking-[-0.02em] text-foreground outline-none transition-colors placeholder:text-muted-foreground hover:bg-[color:var(--input)]/50 focus:border-primary focus:bg-[var(--card-strong)] sm:text-lg"
-        placeholder="Thema benennen …"
+        placeholder="Thema benennen ..."
         onKeyDown={onKeyDown}
         onBlur={onBlur}
       />
