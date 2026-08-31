@@ -8,6 +8,8 @@ interface SessionOutlineProps {
   sessionItems: SessionItem[];
 }
 
+const SHOULD_SHOW_POINT_LABELS = false;
+
 const getPointLabel = (point: string, index: number) => {
   const label = point.trim().replace(/\s+/g, " ");
   return label || `Punkt ${index + 1}`;
@@ -28,9 +30,9 @@ export function SessionOutline({ sessionItems }: SessionOutlineProps) {
               Gliederung
             </h2>
           </div>
-          <Badge tone={sessionItems.length ? "accent" : "neutral"}>
+          {/* <Badge tone={sessionItems.length ? "accent" : "neutral"}>
             {sessionItems.length}
-          </Badge>
+          </Badge> */}
         </div>
       </div>
 
@@ -54,7 +56,7 @@ export function SessionOutline({ sessionItems }: SessionOutlineProps) {
                   </span>
                 </a>
 
-                {item.points.length > 0 && (
+                {SHOULD_SHOW_POINT_LABELS && item.points.length > 0 && (
                   <ol className="relative ml-6 border-l border-border py-1 pl-3">
                     {item.points.map((point, pointIndex) => (
                       <li key={pointIndex} className="relative">
