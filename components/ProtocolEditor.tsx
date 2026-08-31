@@ -116,7 +116,7 @@ export function ProtocolEditor({
           availableAssocMembers={availableAssocMembers}
         />
 
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-8">
+        <div className="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-8">
           <SessionOutline sessionItems={sessionItems} />
 
           <section className="min-w-0">
